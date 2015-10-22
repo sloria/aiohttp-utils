@@ -12,6 +12,7 @@ Modules
     :maxdepth: 2
 
     modules/routing
+    modules/negotiation
 
 Project info
 ------------

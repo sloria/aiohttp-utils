@@ -8,7 +8,7 @@ from aiohttp_utils.routing import ResourceRouter
 
 @pytest.fixture()
 def app(loop):
-    return web.Application(router=ResourceRouter())
+    return web.Application(loop=loop, router=ResourceRouter())
 
 @pytest.fixture()
 def client(create_client, app):
