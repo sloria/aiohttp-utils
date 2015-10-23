@@ -135,14 +135,16 @@ def get_accept_list(request):
 
     Allows URL style accept override.  eg. "?accept=application/json"
     """
-    header = request.headers.get('HTTP_ACCEPT', '*/*')
+    header = request.headers.get('ACCEPT', '*/*')
     header = request.GET.get('accept', header)
     return [token.strip() for token in header.split(',')]
 
 ###### Renderers ######
 
 class BaseRenderer(object):
-    """Base renderer class. Must implement `render`."""
+    """Base renderer class. Must implement `render` method which returns
+    either the body of the negotiated response or an `aiohttp.web.Response`.
+    """
     media_type = None
 
     def render(self, data):
@@ -174,24 +176,28 @@ DEFAULTS = {
 def get_config(app, key):
     return app[APP_KEY].get(key, DEFAULTS[key])
 
-@asyncio.coroutine
-def negotiation_middleware(app, handler):
-    """Middleware which selects a renderer for a given request then renders
-    a handler's data to a `aiohttp.web.Response`.
-    """
-    negotiator = get_config(app, 'NEGOTIATION_CLASS')()
-    renderers = get_config(app, 'RENDERER_CLASSES')
 
+def make_negotiation_middleware(
+    renderers=DEFAULTS['RENDERER_CLASSES'],
+    negotiation_class=DEFAULTS['NEGOTIATION_CLASS']
+):
     @asyncio.coroutine
-    def middleware(request):
-        renderer_cls, content_type = negotiator.select_renderer(
-            request=request,
-            renderers=renderers
-        )
-        renderer = renderer_cls()
+    def factory(app, handler):
+        """Middleware which selects a renderer for a given request then renders
+        a handler's data to a `aiohttp.web.Response`.
+        """
+        negotiator = negotiation_class()
 
-        response = yield from handler(request)
-        if response.data:
+        @asyncio.coroutine
+        def middleware(request):
+            renderer_cls, content_type = negotiator.select_renderer(
+                request=request,
+                renderers=renderers
+            )
+            renderer = renderer_cls()
+
+            response = yield from handler(request)
+
             # Render data with the selected renderer
             if asyncio.iscoroutinefunction(renderer.render):
                 response.body = yield from renderer.render(response.data)
