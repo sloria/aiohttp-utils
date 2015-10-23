@@ -93,3 +93,7 @@ def test_renderer_override_multiple_classes(app, client):
     res = client.get('/hello', headers={'Accept': 'application/json'})
     assert res.content_type == 'application/json'
     assert res.json == {'message': 'Hello world'}
+
+    res = client.get('/hello', headers={'Accept': 'text/html'})
+    assert res.content_type == 'text/html'
+    assert res.body == b'<p>Hello world</p>'

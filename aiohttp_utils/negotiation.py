@@ -59,7 +59,7 @@ import json as pyjson
 from aiohttp import web
 
 from .constants import APP_KEY
-from .mediatypes import media_type_matches, _MediaType, HTTP_HEADER_ENCODING
+from .mediatypes import order_by_precedence, media_type_matches, _MediaType, HTTP_HEADER_ENCODING
 
 
 class Response(web.Response):
@@ -101,7 +101,7 @@ class DefaultContentNegotiation(BaseContentNegotiation):
         # attempting more specific media types first
         # NB. The inner loop here isn't as bad as it first looks :)
         #     Worst case is we're looping over len(accept_list) * len(self.renderers)
-        for media_type_set in accepts:
+        for media_type_set in order_by_precedence(accepts):
             for renderer in renderers:
                 for media_type in media_type_set:
                     if media_type_matches(renderer.media_type, media_type):
@@ -200,13 +200,24 @@ def make_negotiation_middleware(
 
             # Render data with the selected renderer
             if asyncio.iscoroutinefunction(renderer.render):
-                response.body = yield from renderer.render(response.data)
+                render_result = yield from renderer.render(response.data)
             else:
-                response.body = renderer.render(response.data)
-            response.content_type = content_type
+                render_result = renderer.render(response.data)
 
-        return response
-    return middleware
+            if isinstance(render_result, web.Response):
+                return render_result
+
+            if response.data:
+                response.body = render_result
+                if asyncio.iscoroutinefunction(renderer.render):
+                    response.body = yield from renderer.render(response.data)
+                else:
+                    response.body = renderer.render(response.data)
+                response.content_type = content_type
+
+            return response
+        return middleware
+    return factory
 
 
 def setup(app: web.Application, overrides: dict=None):
@@ -220,5 +231,10 @@ def setup(app: web.Application, overrides: dict=None):
     config.update(DEFAULTS)
     config.update(overrides)
     app[APP_KEY] = config
-    app.middlewares.append(negotiation_middleware)
+
+    middleware = make_negotiation_middleware(
+        renderers=config['RENDERER_CLASSES'],
+        negotiation_class=config['NEGOTIATION_CLASS']
+    )
+    app.middlewares.append(middleware)
     return app
