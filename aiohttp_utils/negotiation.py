@@ -162,6 +162,9 @@ class JSONRenderer(BaseRenderer):
     def render(self, data):
         return self.json_module.dumps(data).encode('utf-8')
 
+class JSONAPIRenderer(JSONRenderer):
+    """Renders to JSON with the JSON API 1.0 media type."""
+    media_type = 'application/vnd.api+json'
 
 ##### Main API #####
 

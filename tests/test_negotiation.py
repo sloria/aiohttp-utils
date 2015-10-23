@@ -87,11 +87,16 @@ def test_renderer_override_multiple_classes(app, client):
         'RENDERER_CLASSES': [
             DummyRenderer,
             negotiation.JSONRenderer,
+            negotiation.JSONAPIRenderer,
         ]
     }, setup=True)
 
     res = client.get('/hello', headers={'Accept': 'application/json'})
     assert res.content_type == 'application/json'
+    assert res.json == {'message': 'Hello world'}
+
+    res = client.get('/hello', headers={'Accept': 'application/vnd.api+json'})
+    assert res.content_type == 'application/vnd.api+json'
     assert res.json == {'message': 'Hello world'}
 
     res = client.get('/hello', headers={'Accept': 'text/html'})
