@@ -213,10 +213,6 @@ def make_negotiation_middleware(
 
             if response.data:
                 response.body = render_result
-                if asyncio.iscoroutinefunction(renderer.render):
-                    response.body = yield from renderer.render(response.data)
-                else:
-                    response.body = renderer.render(response.data)
                 response.content_type = content_type
 
             return response
