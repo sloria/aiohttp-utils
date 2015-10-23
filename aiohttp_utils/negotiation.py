@@ -90,11 +90,12 @@ class DefaultContentNegotiation(BaseContentNegotiation):
 
     force = True
 
-    def select_renderer(self, request, renderers):
+    def select_renderer(self, request, renderers, force=None):
         """
         Given a request and a list of renderers, return a two-tuple of:
         (renderer, media type).
         """
+        force = force if force is not None else self.force
         accepts = get_accept_list(request)
 
         # Check the acceptable media types against each renderer,
@@ -123,7 +124,7 @@ class DefaultContentNegotiation(BaseContentNegotiation):
                             # Eg client requests 'application/json; indent=8'
                             # Accepted media type is 'application/json; indent=8'
                             return renderer, media_type
-        if self.force:
+        if force:
             return (renderers[0], renderers[0].media_type)
         else:
             raise web.HTTPNotAcceptable()
@@ -169,7 +170,8 @@ DEFAULTS = {
     'NEGOTIATION_CLASS': DefaultContentNegotiation,
     'RENDERER_CLASSES': [
         JSONRenderer,
-    ]
+    ],
+    'FORCE_NEGOTIATION': True,
 }
 
 
@@ -179,7 +181,8 @@ def get_config(app, key):
 
 def make_negotiation_middleware(
     renderers=DEFAULTS['RENDERER_CLASSES'],
-    negotiation_class=DEFAULTS['NEGOTIATION_CLASS']
+    negotiation_class=DEFAULTS['NEGOTIATION_CLASS'],
+    force_negotiation=True
 ):
     @asyncio.coroutine
     def factory(app, handler):
@@ -192,7 +195,8 @@ def make_negotiation_middleware(
         def middleware(request):
             renderer_cls, content_type = negotiator.select_renderer(
                 request=request,
-                renderers=renderers
+                renderers=renderers,
+                force=force_negotiation
             )
             renderer = renderer_cls()
 
@@ -234,7 +238,8 @@ def setup(app: web.Application, overrides: dict=None):
 
     middleware = make_negotiation_middleware(
         renderers=config['RENDERER_CLASSES'],
-        negotiation_class=config['NEGOTIATION_CLASS']
+        negotiation_class=config['NEGOTIATION_CLASS'],
+        force_negotiation=config['FORCE_NEGOTIATION']
     )
     app.middlewares.append(middleware)
     return app

@@ -97,3 +97,11 @@ def test_renderer_override_multiple_classes(app, client):
     res = client.get('/hello', headers={'Accept': 'text/html'})
     assert res.content_type == 'text/html'
     assert res.body == b'<p>Hello world</p>'
+
+def test_renderer_override_force(app, client):
+    configure_app(app, overrides={
+        'FORCE_NEGOTIATION': False,
+    }, setup=True)
+
+    res = client.get('/hello', headers={'Accept': 'text/notsupported'}, expect_errors=True)
+    assert res.status_code == 406
