@@ -8,24 +8,25 @@ reload when code changes.
 
     app = web.Application()
     # ...
-    runner.run(app, port=5000)
+    runner.run(app, app_uri='path.to.module:app', port=5000)
 """
 from aiohttp import web
-from gunicorn.app.wsgiapp import WSGIApplication as BaseApplication
 from aiohttp.worker import GunicornWebWorker as BaseWorker
+from gunicorn.app.wsgiapp import WSGIApplication as BaseApplication
+from gunicorn.util import import_app
 
 
 class GunicornWorker(BaseWorker):
     # Override to set the app's loop to the worker's loop
     def make_handler(self, app, host, port):
-        # self.loop.set_debug(app.debug)
         app._loop = self.loop
         return super().make_handler(app, host, port)
 
 class GunicornApp(BaseApplication):
 
-    def __init__(self, app: web.Application, *args, **kwargs):
+    def __init__(self, app: web.Application, app_uri: str=None, *args, **kwargs):
         self._app = app
+        self.app_uri = app_uri
         super().__init__(*args, **kwargs)
 
     # Override BaseApplication so that we don't try to parse command-line args
@@ -35,6 +36,8 @@ class GunicornApp(BaseApplication):
     # Override BaseApplication to return aiohttp app
     def load(self):
         self.chdir()
+        if self.app_uri:
+            return import_app(self.app_uri)
         return self._app
 
 class Runner:
@@ -43,15 +46,19 @@ class Runner:
     def __init__(
         self,
         app: web.Application=None,
+        app_uri: str=None,
         host='127.0.0.1',
         port=5000,
         reload: bool=None,
         **options
     ):
         self.app = app
+        self.app_uri = app_uri
         self.host = host
         self.port = port
         self.reload = reload or app.debug
+        if self.reload and not self.app_uri:
+            raise RuntimeError('"reload" option requires "app_uri"')
         self.options = options
 
     @property
@@ -59,7 +66,7 @@ class Runner:
         return '{self.host}:{self.port}'.format(self=self)
 
     def make_gunicorn_app(self):
-        gapp = GunicornApp(self.app)
+        gapp = GunicornApp(self.app, app_uri=self.app_uri)
         gapp.cfg.set('bind', self.bind)
         gapp.cfg.set('reload', self.reload)
         gapp.cfg.settings['worker_class'].default = self.worker_class
@@ -77,6 +84,11 @@ def run(app, **kwargs):
     """Run an `aiohttp.web.Application` using gunicorn.
 
     :param web.Application app: The app to run.
+    :param web.Application app_uri: Import path to `app`. Takes the form
+        $(MODULE_NAME):$(VARIABLE_NAME).
+        The module name can be a full dotted path.
+        The variable name refers to the `aiohttp.web.Application`.
+        This argument is required if ``reload=True``.
     :param str host: Hostname to listen on.
     :param int port: Port of the server.
     :param bool reload: Whether to reload the server on a code change.

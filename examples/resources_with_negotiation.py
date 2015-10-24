@@ -16,7 +16,7 @@ from aiohttp import web
 
 from aiohttp_utils import Response, routing, negotiation, runner
 
-app = web.Application(router=routing.ResourceRouter(), debug=True)
+app = web.Application(router=routing.ResourceRouter())
 
 class HelloResource:
 
@@ -31,4 +31,9 @@ app.router.add_resource('/', HelloResource())
 negotiation.setup(app)
 
 if __name__ == "__main__":
-    runner.run(app, port=8000)
+    runner.run(
+        app,
+        app_uri="examples.resources_with_negotiation:app",
+        reload=True,
+        port=8000
+    )
