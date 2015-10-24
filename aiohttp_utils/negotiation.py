@@ -1,13 +1,5 @@
 """Content negotiation API.
 
-.. note::
-
-    Handlers must return `aiohttp_utils.negotiation.Response` (which can be imported from
-    the top-level `aiohttp` module) for data
-    to be properly negotiated. `aiohttp_utils.negotiation.Response` is the
-    same as `aiohttp.web.Response`, except that its first
-    argument is `data`, which is the data to be negotiated.
-
 .. code-block:: python
 
     import asyncio
@@ -38,6 +30,15 @@
     except KeyboardInterrupt:
         pass
 
+.. note::
+
+    Handlers must return `aiohttp_utils.negotiation.Response` (which can be imported from
+    the top-level `aiohttp` module) for data
+    to be properly negotiated. `aiohttp_utils.negotiation.Response` is the
+    same as `aiohttp.web.Response`, except that its first
+    argument is `data`, which is the data to be negotiated.
+
+
 The middleware will render responses to JSON by default.
 
 Example with httpie:
@@ -58,23 +59,23 @@ Example with httpie:
 Customizing negotiation
 =======================
 
-Renderers are just callables that receive data and return the rendered representation of that
-data.
+Renderers are just callables that receive a `request <aiohttp.web.Request>`
+data and return the rendered representation of that data.
 
 Example:
 
 .. code-block:: python
 
-    def render_text(data):
+    def render_text(request, data):
         return data.encode('utf-8')
 
-    # OR, if you need to parametrize, you can use a class
+    # OR, if you need to parametrize your renderer, you can use a class
 
     class TextRenderer:
         def __init__(self, charset):
             self.charset = charset
 
-        def __call__(self, data):
+        def __call__(self, request, data):
             return data.encode(self.charset)
 
     render_text_utf8 = TextRenderer('utf-8')
@@ -94,24 +95,24 @@ with a corresponding mediatype.
 
     negotiation.setup(app, {
         'RENDERERS': OrderedDict([
-            ('text/plain', render_text)
-            ('application/json', negotiation.render_json)
+            ('text/plain', render_text),
+            ('application/json', negotiation.render_json),
         ])
     })
 """
+from collections import OrderedDict
 import asyncio
 import json as pyjson
-import mimeparse
-from collections import OrderedDict
 
 from aiohttp import web
+import mimeparse
 
 from .constants import APP_KEY
 
 class Response(web.Response):
     """Same as `aiohttp.web.Response`, except that the constructor takes a `data` argument,
     which is the data to be negotiated by the
-    `negotiation_middleware <aiohttp_utils.negotiation.negotiation_middleware`.
+    `negotiation_middleware <aiohttp_utils.negotiation.make_negotiation_middleware>`.
     """
 
     def __init__(self, data=None, *args, **kwargs):
@@ -143,12 +144,13 @@ def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
 
 # Use a class so that json module is easily override-able
 class JSONRenderer:
-    """Renders to JSON."""
+    """Callable object which renders to JSON."""
     json_module = pyjson
 
-    def __call__(self, data):
+    def __call__(self, request, data):
         return self.json_module.dumps(data).encode('utf-8')
 
+#: Render data to JSON.
 render_json = JSONRenderer()
 
 ##### Main API #####
@@ -189,9 +191,9 @@ def make_negotiation_middleware(
 
             # Render data with the selected renderer
             if asyncio.iscoroutinefunction(renderer):
-                render_result = yield from renderer(response.data)
+                render_result = yield from renderer(request, response.data)
             else:
-                render_result = renderer(response.data)
+                render_result = renderer(request, response.data)
 
             if isinstance(render_result, web.Response):
                 return render_result
