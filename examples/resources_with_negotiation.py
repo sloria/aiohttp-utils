@@ -14,28 +14,21 @@ Try it out:
 """
 from aiohttp import web
 
-from aiohttp_utils import Response, routing, negotiation
+from aiohttp_utils import Response, routing, negotiation, runner
 
+app = web.Application(router=routing.ResourceRouter(), debug=True)
 
-class EchoResource:
+class HelloResource:
 
     async def get(self, request):
+        name = request.GET.get('name', 'World')
         return Response({
-            'GET': dict(request.GET)
-        })
-
-    async def post(self, request):
-        data = await request.json()
-        return Response({
-            'POST': dict(data)
+            'message': 'Hello ' + name
         })
 
 
-def create_app():
-    app = web.Application(router=routing.ResourceRouter())
-    app.router.add_resource('/', EchoResource())
+app.router.add_resource('/', HelloResource())
+negotiation.setup(app)
 
-    negotiation.setup(app)
-    return app
-
-app = create_app()
+if __name__ == "__main__":
+    runner.run(app, port=8000)

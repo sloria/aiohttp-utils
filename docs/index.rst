@@ -3,7 +3,7 @@ aiohttp_utils
 
 Release v\ |version|. (:ref:`Changelog <changelog>`)
 
-**aiohttp_utils** provides handy utilities for building aiohttp.web applications.
+**aiohttp_utils** provides handy utilities for building `aiohttp.web <http://aiohttp.readthedocs.org/>`_ applications.
 
 Modules
 -------
@@ -13,6 +13,7 @@ Modules
 
     modules/routing
     modules/negotiation
+    modules/runner
 
 Project info
 ------------

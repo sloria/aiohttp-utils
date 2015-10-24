@@ -10,7 +10,7 @@ aiohttp_utils
 ..     :target: https://travis-ci.org/sloria/aiohttp_utils
 ..     :alt: Travis-CI
 
-Handy utilities for aiohttp.web applications.
+**aiohttp_utils** provides handy utilities for building `aiohttp.web <http://aiohttp.readthedocs.org/>`_ applications.
 
 .. Documentation
 .. =============
