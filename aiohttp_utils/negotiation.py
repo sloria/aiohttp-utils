@@ -1,8 +1,14 @@
-"""Content negotiation API. Includes
-`ContentNegotation <aiohttp_utils.negotiation.BaseContentNegotiation>` classes,
-which are responsible for selecting an appropriate
-`Renderer <aiohttp_utils.negotiation.BaseRenderer>` for a given request.
-::
+"""Content negotiation API.
+
+.. note::
+
+    Handlers must return `aiohttp_utils.negotiation.Response` (which can be imported from
+    the top-level `aiohttp` module) for data
+    to be properly negotiated. `aiohttp_utils.negotiation.Response` is the
+    same as `aiohttp.web.Response`, except that its first
+    argument is `data`, which is the data to be negotiated.
+
+.. code-block:: python
 
     import asyncio
 
@@ -49,9 +55,49 @@ Example with httpie:
         "message": "Let's negotiate"
     }
 
+Customizing negotiation
+=======================
 
-Most of the implementation for the ContentNegotation and Renderer classes are
-attributed to Django Rest Framework. See NOTICE for license information.
+Renderers are just callables that receive data and return the rendered representation of that
+data.
+
+Example:
+
+.. code-block:: python
+
+    def render_text(data):
+        return data.encode('utf-8')
+
+    # OR, if you need to parametrize, you can use a class
+
+    class TextRenderer:
+        def __init__(self, charset):
+            self.charset = charset
+
+        def __call__(self, data):
+            return data.encode(self.charset)
+
+    render_text_utf8 = TextRenderer('utf-8')
+    render_text_utf16 = TextRenderer('utf-16')
+
+You can then pass your renderers to `setup <aiohttp_utils.negotiation.setup>`
+with a corresponding mediatype.
+
+.. note::
+
+    We use an `OrderedDict <collections.OrderedDict>` because priority is given to
+    the first specified renderer when the client passes an unsupported media type.
+
+.. code-block:: python
+
+    from aiohttp_utils import negotiation
+
+    negotiation.setup(app, {
+        'RENDERERS': OrderedDict([
+            ('text/plain', render_text)
+            ('application/json', negotiation.render_json)
+        ])
+    })
 """
 import asyncio
 import json as pyjson

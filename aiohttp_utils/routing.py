@@ -1,4 +1,4 @@
-"""Custom router classes."""
+"""Routing utilities."""
 from collections.abc import Mapping, Iterable
 
 from aiohttp import web
