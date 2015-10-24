@@ -55,12 +55,11 @@ attributed to Django Rest Framework. See NOTICE for license information.
 """
 import asyncio
 import json as pyjson
+import mimeparse
 
 from aiohttp import web
 
 from .constants import APP_KEY
-from .mediatypes import order_by_precedence, media_type_matches, _MediaType, HTTP_HEADER_ENCODING
-
 
 class Response(web.Response):
     """Same as `aiohttp.web.Response`, except that the constructor takes a `data` argument,
@@ -96,49 +95,20 @@ class DefaultContentNegotiation(BaseContentNegotiation):
         (renderer, media type).
         """
         force = force if force is not None else self.force
-        accepts = get_accept_list(request)
+        # accepts = get_accept_list(request)
 
-        # Check the acceptable media types against each renderer,
-        # attempting more specific media types first
-        # NB. The inner loop here isn't as bad as it first looks :)
-        #     Worst case is we're looping over len(accept_list) * len(self.renderers)
-        for media_type_set in order_by_precedence(accepts):
-            for renderer in renderers:
-                for media_type in media_type_set:
-                    if media_type_matches(renderer.media_type, media_type):
-                        # Return the most specific media type as accepted.
-                        media_type_wrapper = _MediaType(media_type)
-                        if (
-                            _MediaType(renderer.media_type).precedence >
-                            media_type_wrapper.precedence
-                        ):
-                            # Eg client requests '*/*'
-                            # Accepted media type is 'application/json'
-                            full_media_type = ';'.join(
-                                (renderer.media_type,) +
-                                tuple('{0}={1}'.format(
-                                    key, value.decode(HTTP_HEADER_ENCODING))
-                                    for key, value in media_type_wrapper.params.items()))
-                            return renderer, full_media_type
-                        else:
-                            # Eg client requests 'application/json; indent=8'
-                            # Accepted media type is 'application/json; indent=8'
-                            return renderer, media_type
-        if force:
-            return (renderers[0], renderers[0].media_type)
-        else:
-            raise web.HTTPNotAcceptable()
-
-def get_accept_list(request):
-    """
-    Given the incoming request, return a tokenised list of media
-    type strings.
-
-    Allows URL style accept override.  eg. "?accept=application/json"
-    """
-    header = request.headers.get('ACCEPT', '*/*')
-    header = request.GET.get('accept', header)
-    return [token.strip() for token in header.split(',')]
+        renderers_by_mediatype = {
+            each.media_type: each
+            for each in renderers
+        }
+        header = request.headers.get('ACCEPT', '*/*')
+        best_match = mimeparse.best_match(renderers_by_mediatype.keys(), header)
+        if not best_match:
+            if force:
+                return renderers[0], renderers[0].media_type
+            else:
+                raise web.HTTPNotAcceptable
+        return renderers_by_mediatype[best_match], best_match
 
 ###### Renderers ######
 
@@ -187,11 +157,11 @@ def make_negotiation_middleware(
     negotiation_class=DEFAULTS['NEGOTIATION_CLASS'],
     force_negotiation=True
 ):
+    """Middleware which selects a renderer for a given request then renders
+    a handler's data to a `aiohttp.web.Response`.
+    """
     @asyncio.coroutine
     def factory(app, handler):
-        """Middleware which selects a renderer for a given request then renders
-        a handler's data to a `aiohttp.web.Response`.
-        """
         negotiator = negotiation_class()
 
         @asyncio.coroutine
