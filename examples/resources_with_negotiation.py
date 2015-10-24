@@ -14,7 +14,6 @@ Try it out:
     $ http :8000/ name==Ada
 """
 from aiohttp import web
-
 from aiohttp_utils import Response, routing, negotiation, runner
 
 app = web.Application(router=routing.ResourceRouter())
