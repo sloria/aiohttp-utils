@@ -4,6 +4,7 @@ from setuptools import setup, find_packages
 
 REQUIRES = [
     'aiohttp',
+    'python-mimeparse',
 ]
 
 def find_version(fname):
