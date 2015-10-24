@@ -56,6 +56,7 @@ attributed to Django Rest Framework. See NOTICE for license information.
 import asyncio
 import json as pyjson
 import mimeparse
+from collections import OrderedDict
 
 from aiohttp import web
 
@@ -76,74 +77,42 @@ class Response(web.Response):
         super().__init__(*args, **kwargs)
 
 
-##### ContentNegotiation classes #####
+##### Negotiation strategies #####
 
-class BaseContentNegotiation(object):
-    """Base content negotiation class. Must implement `select_renderer`."""
-
-    def select_renderer(self, request, renderers):
-        raise NotImplementedError('.select_renderer() must be implemented')
-
-class DefaultContentNegotiation(BaseContentNegotiation):
-    """Default content negotation class."""
-
-    force = True
-
-    def select_renderer(self, request, renderers, force=None):
-        """
-        Given a request and a list of renderers, return a two-tuple of:
-        (renderer, media type).
-        """
-        force = force if force is not None else self.force
-        # accepts = get_accept_list(request)
-
-        renderers_by_mediatype = {
-            each.media_type: each
-            for each in renderers
-        }
-        header = request.headers.get('ACCEPT', '*/*')
-        best_match = mimeparse.best_match(renderers_by_mediatype.keys(), header)
-        if not best_match:
-            if force:
-                return renderers[0], renderers[0].media_type
-            else:
-                raise web.HTTPNotAcceptable
-        return renderers_by_mediatype[best_match], best_match
+def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
+    """
+    Given a request and a list of renderers, return a two-tuple of:
+    (media type, render callable).
+    """
+    header = request.headers.get('ACCEPT', '*/*')
+    best_match = mimeparse.best_match(renderers.keys(), header)
+    if not best_match or best_match not in renderers:
+        if force:
+            return tuple(renderers.items())[0]
+        else:
+            raise web.HTTPNotAcceptable
+    return best_match, renderers[best_match]
 
 ###### Renderers ######
 
-class BaseRenderer(object):
-    """Base renderer class. Must implement `render` method which returns
-    either the body of the negotiated response or an `aiohttp.web.Response`.
-    """
-    media_type = None
-
-    def render(self, data):
-        raise NotImplementedError('Renderer class requires .render() to be implemented')
-
-
-class JSONRenderer(BaseRenderer):
+# Use a class so that json module is easily override-able
+class JSONRenderer:
     """Renders to JSON."""
-
-    media_type = 'application/json'
-
     json_module = pyjson
 
-    def render(self, data):
+    def __call__(self, data):
         return self.json_module.dumps(data).encode('utf-8')
 
-class JSONAPIRenderer(JSONRenderer):
-    """Renders to JSON with the JSON API 1.0 media type."""
-    media_type = 'application/vnd.api+json'
+render_json = JSONRenderer()
 
 ##### Main API #####
 
 #: Default configuration
 DEFAULTS = {
-    'NEGOTIATION_CLASS': DefaultContentNegotiation,
-    'RENDERER_CLASSES': [
-        JSONRenderer,
-    ],
+    'NEGOTIATOR': select_renderer,
+    'RENDERERS': OrderedDict([
+        ('application/json', render_json),
+    ]),
     'FORCE_NEGOTIATION': True,
 }
 
@@ -153,8 +122,8 @@ def get_config(app, key):
 
 
 def make_negotiation_middleware(
-    renderers=DEFAULTS['RENDERER_CLASSES'],
-    negotiation_class=DEFAULTS['NEGOTIATION_CLASS'],
+    renderers=DEFAULTS['RENDERERS'],
+    negotiator=DEFAULTS['NEGOTIATOR'],
     force_negotiation=True
 ):
     """Middleware which selects a renderer for a given request then renders
@@ -162,24 +131,21 @@ def make_negotiation_middleware(
     """
     @asyncio.coroutine
     def factory(app, handler):
-        negotiator = negotiation_class()
 
         @asyncio.coroutine
         def middleware(request):
-            renderer_cls, content_type = negotiator.select_renderer(
+            content_type, renderer = negotiator(
                 request=request,
                 renderers=renderers,
                 force=force_negotiation
             )
-            renderer = renderer_cls()
-
             response = yield from handler(request)
 
             # Render data with the selected renderer
-            if asyncio.iscoroutinefunction(renderer.render):
-                render_result = yield from renderer.render(response.data)
+            if asyncio.iscoroutinefunction(renderer):
+                render_result = yield from renderer(response.data)
             else:
-                render_result = renderer.render(response.data)
+                render_result = renderer(response.data)
 
             if isinstance(render_result, web.Response):
                 return render_result
@@ -206,8 +172,8 @@ def setup(app: web.Application, overrides: dict=None):
     app[APP_KEY] = config
 
     middleware = make_negotiation_middleware(
-        renderers=config['RENDERER_CLASSES'],
-        negotiation_class=config['NEGOTIATION_CLASS'],
+        renderers=config['RENDERERS'],
+        negotiator=config['NEGOTIATOR'],
         force_negotiation=config['FORCE_NEGOTIATION']
     )
     app.middlewares.append(middleware)

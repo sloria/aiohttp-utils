@@ -1,5 +1,6 @@
 import pytest
 import asyncio
+from collections import OrderedDict
 
 from aiohttp import web
 
@@ -35,9 +36,9 @@ def configure_app(app, overrides=None, setup=False):
         negotiation.setup(app, overrides=overrides)
     else:
         middleware = negotiation.make_negotiation_middleware(
-            [
-                negotiation.JSONRenderer
-            ]
+            renderers=OrderedDict([
+                ('application/json', negotiation.render_json)
+            ])
         )
         app.middlewares.append(middleware)
 
@@ -62,20 +63,17 @@ def test_renders_to_json_by_default(app, client, setup):
     assert res.json == {'message': 'Post coro'}
 
 
-class DummyRenderer(negotiation.BaseRenderer):
-    media_type = 'text/html'
-
-    def render(self, data):
-        return web.Response(
-            body='<p>{}</p>'.format(data['message']).encode('utf-8'),
-            content_type='text/html'
-        )
+def dummy_renderer(data):
+    return web.Response(
+        body='<p>{}</p>'.format(data['message']).encode('utf-8'),
+        content_type='text/html'
+    )
 
 def test_renderer_override(app, client):
     configure_app(app, overrides={
-        'RENDERER_CLASSES': [
-            DummyRenderer,
-        ]
+        'RENDERERS': OrderedDict([
+            ('text/html', dummy_renderer),
+        ])
     }, setup=True)
 
     res = client.get('/hello')
@@ -84,11 +82,11 @@ def test_renderer_override(app, client):
 
 def test_renderer_override_multiple_classes(app, client):
     configure_app(app, overrides={
-        'RENDERER_CLASSES': [
-            DummyRenderer,
-            negotiation.JSONRenderer,
-            negotiation.JSONAPIRenderer,
-        ]
+        'RENDERERS': OrderedDict([
+            ('text/html', dummy_renderer),
+            ('application/json', negotiation.render_json),
+            ('application/vnd.api+json', negotiation.render_json),
+        ])
     }, setup=True)
 
     res = client.get('/hello', headers={'Accept': 'application/json'})
@@ -110,3 +108,13 @@ def test_renderer_override_force(app, client):
 
     res = client.get('/hello', headers={'Accept': 'text/notsupported'}, expect_errors=True)
     assert res.status_code == 406
+
+def test_nonordered_dict_of_renderers(app, client):
+    configure_app(app, overrides={
+        'RENDERERS': {
+            'application/json': negotiation.render_json
+        }
+    }, setup=True)
+
+    res = client.get('/hello', headers={'Accept': 'text/notsupported'})
+    assert res.content_type == 'application/json'
