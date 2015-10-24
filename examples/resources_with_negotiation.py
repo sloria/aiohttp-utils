@@ -1,16 +1,17 @@
-"""Example using `routing.ResourceRouter` and `negotiation` (content negotation).
+"""Example using `routing.ResourceRouter`, `negotiation` (content negotation), and local
+development server with reloading.
 
 Start the app with
 ::
-    $ pip install gunicorn http
-    $ gunicorn -k aiohttp.worker.GunicornWebWorker examples.resources_with_negotiation:app --reload
+    $ pip install gunicorn
+    $ python examples/resources_with_negotiation.py
 
 Try it out:
 ::
 
     $ pip install httpie
-    $ http :8000/ message==Hello
-    $ http POST :8000/ message=Greetings
+    $ http :8000/
+    $ http :8000/ name==Ada
 """
 from aiohttp import web
 
