@@ -30,8 +30,12 @@ This package is a toolkit; you can use as much (or as little) of it as you need.
 
 
     app.router.add_resource('/', HelloResource())
-    # Content negotiation (renders to JSON by default)
-    negotiation.setup(app)
+    # Content negotiation
+    negotiation.setup(app, {
+        'RENDERERS': {
+            'application/json': negotiation.render_json
+        }
+    })
 
     if __name__ == '__main__':
         # Development server
@@ -46,7 +50,7 @@ Modules
 -------
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     modules/routing
     modules/negotiation
