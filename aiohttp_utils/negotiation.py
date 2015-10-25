@@ -168,10 +168,6 @@ DEFAULTS = {
 }
 
 
-def get_config(app, key):
-    return app[APP_KEY].get(key, DEFAULTS[key])
-
-
 def negotiation_middleware(
     renderers=DEFAULTS['RENDERERS'],
     negotiator=DEFAULTS['NEGOTIATOR'],
