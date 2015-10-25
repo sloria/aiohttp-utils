@@ -198,16 +198,19 @@ def negotiation_middleware(
             )
             response = yield from handler(request)
 
-            # Render data with the selected renderer
-            if asyncio.iscoroutinefunction(renderer):
-                render_result = yield from renderer(request, response.data)
+            if getattr(response, 'data', None):
+                # Render data with the selected renderer
+                if asyncio.iscoroutinefunction(renderer):
+                    render_result = yield from renderer(request, response.data)
+                else:
+                    render_result = renderer(request, response.data)
             else:
-                render_result = renderer(request, response.data)
+                render_result = response
 
             if isinstance(render_result, web.Response):
                 return render_result
 
-            if response.data:
+            if getattr(response, 'data', None):
                 response.body = render_result
                 response.content_type = content_type
 
