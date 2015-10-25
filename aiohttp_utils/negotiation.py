@@ -112,7 +112,7 @@ from .constants import APP_KEY
 class Response(web.Response):
     """Same as `aiohttp.web.Response`, except that the constructor takes a `data` argument,
     which is the data to be negotiated by the
-    `negotiation_middleware <aiohttp_utils.negotiation.make_negotiation_middleware>`.
+    `negotiation_middleware <aiohttp_utils.negotiation.negotiation_middleware>`.
     """
 
     def __init__(self, data=None, *args, **kwargs):
@@ -172,7 +172,7 @@ def get_config(app, key):
     return app[APP_KEY].get(key, DEFAULTS[key])
 
 
-def make_negotiation_middleware(
+def negotiation_middleware(
     renderers=DEFAULTS['RENDERERS'],
     negotiator=DEFAULTS['NEGOTIATOR'],
     force_negotiation=True
@@ -211,7 +211,8 @@ def make_negotiation_middleware(
 
 
 def setup(app: web.Application, overrides: dict=None):
-    """Set up the negotiation middleware.
+    """Set up the negotiation middleware. Reads configuration from
+    app['aiohttp_utils'].
 
     :param aiohttp.web.Application: Application to set up.
     :param dict overrides: Configuration overrides.
@@ -222,7 +223,7 @@ def setup(app: web.Application, overrides: dict=None):
     config.update(overrides)
     app[APP_KEY] = config
 
-    middleware = make_negotiation_middleware(
+    middleware = negotiation_middleware(
         renderers=config['RENDERERS'],
         negotiator=config['NEGOTIATOR'],
         force_negotiation=config['FORCE_NEGOTIATION']

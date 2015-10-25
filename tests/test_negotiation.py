@@ -17,6 +17,7 @@ def client(create_client, app):
     return create_client(app, lint=False)
 
 def configure_app(app, overrides=None, setup=False):
+    overrides = overrides or {}
 
     def handler(request):
         return Response({'message': 'Hello world'})
@@ -33,13 +34,11 @@ def configure_app(app, overrides=None, setup=False):
     app.router.add_route('GET', '/hellocoro', coro_handler)
     app.router.add_route('POST', '/postcoro', post_coro_handler)
     if setup:
+        overrides = {key.upper(): val for key, val in overrides.items()}
         negotiation.setup(app, overrides=overrides)
     else:
-        middleware = negotiation.make_negotiation_middleware(
-            renderers=OrderedDict([
-                ('application/json', negotiation.render_json)
-            ])
-        )
+        kwargs = {key.lower(): value for key, value in overrides}
+        middleware = negotiation.negotiation_middleware(**kwargs)
         app.middlewares.append(middleware)
 
 @pytest.mark.parametrize('setup',
