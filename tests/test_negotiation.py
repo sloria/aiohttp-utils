@@ -14,7 +14,7 @@ def app(loop):
 
 @pytest.fixture()
 def client(create_client, app):
-    return create_client(app, lint=False)
+    return create_client(app)
 
 def configure_app(app, overrides=None, setup=False):
     overrides = overrides or {}

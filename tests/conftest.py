@@ -15,5 +15,8 @@ def loop():
 @pytest.fixture()
 def create_client(app):
     def maker(*args, **kwargs):
+        # Set to False because we set app['aiohttp_utils'], which
+        # is invalid in wsgi environs
+        kwargs.setdefault('lint', False)
         return TestApp(app, *args, **kwargs)
     return maker
