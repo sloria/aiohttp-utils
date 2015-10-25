@@ -2,9 +2,9 @@
 aiohttp_utils
 *************
 
-.. .. image:: https://badge.fury.io/py/aiohttp_utils.png
-..     :target: http://badge.fury.io/py/aiohttp_utils
-..     :alt: Latest version
+.. image:: https://badge.fury.io/py/aiohttp_utils.png
+    :target: http://badge.fury.io/py/aiohttp_utils
+    :alt: Latest version
 
 .. image:: https://travis-ci.org/sloria/aiohttp_utils.png
     :target: https://travis-ci.org/sloria/aiohttp_utils
@@ -55,24 +55,24 @@ aiohttp_utils
             port=8000
         )
 
-.. Install
-.. =======
-.. ::
+Install
+=======
+::
 
-..     $ pip install aiohttp_utils
+    $ pip install aiohttp_utils
 
 Documentation
 =============
 
 Full documentation is available at https://aiohttp-utils.readthedocs.org/.
 
-.. Project Links
-.. =============
+Project Links
+=============
 
-.. - Docs: http://aiohttp-utils.readthedocs.org/
-.. - Changelog: http://aiohttp-utils.readthedocs.org/en/latest/changelog.html
-.. - PyPI: https://pypi.python.org/pypi/aiohttp_utils
-.. - Issues: https://github.com/sloria/aiohttp_utils/issues
+- Docs: http://aiohttp-utils.readthedocs.org/
+- Changelog: http://aiohttp-utils.readthedocs.org/en/latest/changelog.html
+- PyPI: https://pypi.python.org/pypi/aiohttp_utils
+- Issues: https://github.com/sloria/aiohttp_utils/issues
 
 License
 =======
