@@ -155,6 +155,7 @@ def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
         app.router['ArticleList:get'].url()  # /api/articles/
         app.router['ArticleDetail:get'].url(parts={'pk': 42})  # /api/articles/42
     """
+    assert isinstance(app.router, ResourceRouter), 'app must be using ResourceRouter'
 
     def get_base_name(resource, method_name, names):
         return names.get(method_name,
