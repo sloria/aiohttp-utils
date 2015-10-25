@@ -55,16 +55,22 @@ aiohttp_utils
             port=8000
         )
 
-.. Documentation
-.. =============
+.. Install
+.. =======
+.. ::
 
-.. Full documentation is available at https://aiohttp_utils.readthedocs.org/.
+..     $ pip install aiohttp_utils
+
+Documentation
+=============
+
+Full documentation is available at https://aiohttp-utils.readthedocs.org/.
 
 .. Project Links
 .. =============
 
-.. - Docs: http://aiohttp_utils.rtfd.org/
-.. - Changelog: http://aiohttp_utils.readthedocs.org/en/latest/changelog.html
+.. - Docs: http://aiohttp-utils.readthedocs.org/
+.. - Changelog: http://aiohttp-utils.readthedocs.org/en/latest/changelog.html
 .. - PyPI: https://pypi.python.org/pypi/aiohttp_utils
 .. - Issues: https://github.com/sloria/aiohttp_utils/issues
 

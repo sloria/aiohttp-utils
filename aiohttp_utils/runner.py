@@ -93,9 +93,9 @@ def run(app, **kwargs):
 
     :param aiohttp.web.Application app: The app to run.
     :param str app_uri: Import path to `app`. Takes the form
-        $(MODULE_NAME):$(VARIABLE_NAME).
+        ``$(MODULE_NAME):$(VARIABLE_NAME)``.
         The module name can be a full dotted path.
-        The variable name refers to the `aiohttp.web.Application`.
+        The variable name refers to the `aiohttp.web.Application` instance.
         This argument is required if ``reload=True``.
     :param str host: Hostname to listen on.
     :param int port: Port of the server.

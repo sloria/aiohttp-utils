@@ -48,6 +48,12 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
             port=8000
         )
 
+.. Install
+.. =======
+.. ::
+
+..     $ pip install aiohttp_utils
+
 Utilities
 ---------
 

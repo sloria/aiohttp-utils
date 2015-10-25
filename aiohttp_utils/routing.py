@@ -16,7 +16,9 @@ class ResourceRouter(web.UrlDispatcher):
     a.k.a "resources". Includes all the methods `aiohttp.web.UrlDispatcher` with the addition
     of `add_resource`.
 
-    Example: ::
+    Example:
+
+    .. code-block:: python
 
         from aiohttp import web
         from aiohttp_utils.routing import ResourceRouter
@@ -84,7 +86,9 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
     """Context manager which yields a function for adding multiple routes from a given module.
 
     Example:
-    ::
+
+    .. code-block:: python
+
         # myapp/articles/views.py
         async def list_articles(request):
             return web.Response(b'article list...')
@@ -92,7 +96,7 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
         async def create_article(request):
             return web.Response(b'created article...')
 
-    ::
+    .. code-block:: python
 
         # myapp/app.py
         from myapp.articles import views
@@ -103,7 +107,9 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
 
         app.router['articles.list_articles'].url()  # /api/articles/
 
-    If you prefer, you can also pass module and handler names as strings. ::
+    If you prefer, you can also pass module and handler names as strings.
+
+    .. code-block:: python
 
         with add_route_context(app, module='myapp.articles.views',
                                url_prefix='/api/', name_prefix='articles') as route:
@@ -151,6 +157,7 @@ def add_resource_context(
     to an app using `ResourceRouter <aiohttp_utils.routing.ResourceRouter>`.
 
     Example:
+
     .. code-block:: python
 
         # myapp/articles/views.py
