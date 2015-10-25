@@ -98,6 +98,12 @@ class TestAddRouteContext:
         assert app.router['list_projects'].url() == '/projects/'
         assert app.router['create_projects'].url() == '/projects'
 
+    def test_route_name_override(self, app):
+        with add_route_context(app) as route:
+            route('GET', '/', views.index, name='home')
+
+        assert app.router['home'].url() == '/'
+
     def test_add_route_raises_error_if_handler_not_found(self, app):
         with add_route_context(app, views) as route:
             with pytest.raises(AttributeError):

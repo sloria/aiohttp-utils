@@ -79,7 +79,6 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
     Example:
     ::
         # myapp/articles/views.py
-
         async def list_articles(request):
             return web.Response(b'article list...')
 
@@ -89,7 +88,6 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
     ::
 
         # myapp/app.py
-
         from myapp.articles import views
 
         with add_route_context(app, url_prefix='/api/', name_prefix='articles') as route:
@@ -98,22 +96,24 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
 
         app.router['articles.list_articles'].url()  # /api/articles/
     """
-    def add_route(method, path, handler):
+    def add_route(method, path, handler, name=None):
         """
         :param str method: HTTP method.
         :param str path: Path for the route.
         :param handler: A handler function or a name of a handler function contained
             in `module`.
+        :param str name: Name for the route. If `None`, defaults to the handler's
+            function name.
         """
         if isinstance(handler, (str, bytes)):
             if not module:
                 raise ValueError(
                     'Must pass module to add_route_context if passing handler name strings.'
                 )
-            name = handler
+            name = name or handler
             handler = getattr(module, handler)
         else:
-            name = handler.__name__
+            name = name or handler.__name__
         path = make_path(path, url_prefix)
         name = '.'.join((name_prefix, name)) if name_prefix else name
         return app.router.add_route(method, path, handler, name=name)
@@ -135,7 +135,6 @@ def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
     ::
 
         # myapp/articles/views.py
-
         class ArticleList:
             async def get(self, request):
                 return web.Response(b'article list...')
@@ -147,7 +146,6 @@ def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
     ::
 
         # myapp/app.py
-
         from myapp.articles import views
 
         with add_resource_context(app, url_prefix='/api/') as route:
