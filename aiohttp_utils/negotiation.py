@@ -228,7 +228,8 @@ def setup(app: web.Application, overrides: dict=None):
     """
     overrides = overrides or {}
     config = app.get(APP_KEY, {})
-    config.update(DEFAULTS)
+    for key, val in DEFAULTS.items():
+        config.setdefault(key, val)
     config.update(overrides)
     app[APP_KEY] = config
 

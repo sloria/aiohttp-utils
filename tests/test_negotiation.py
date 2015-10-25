@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from aiohttp import web
 
-from aiohttp_utils import negotiation
+from aiohttp_utils import negotiation, APP_KEY
 from aiohttp_utils.negotiation import Response
 
 
@@ -16,9 +16,7 @@ def app(loop):
 def client(create_client, app):
     return create_client(app)
 
-def configure_app(app, overrides=None, setup=False):
-    overrides = overrides or {}
-
+def add_routes(app):
     def handler(request):
         return Response({'message': 'Hello world'})
 
@@ -33,6 +31,11 @@ def configure_app(app, overrides=None, setup=False):
     app.router.add_route('GET', '/hello', handler)
     app.router.add_route('GET', '/hellocoro', coro_handler)
     app.router.add_route('POST', '/postcoro', post_coro_handler)
+
+def configure_app(app, overrides=None, setup=False):
+    overrides = overrides or {}
+    add_routes(app)
+
     if setup:
         overrides = {key.upper(): val for key, val in overrides.items()}
         negotiation.setup(app, overrides=overrides)
@@ -117,3 +120,16 @@ def test_nonordered_dict_of_renderers(app, client):
 
     res = client.get('/hello', headers={'Accept': 'text/notsupported'})
     assert res.content_type == 'application/json'
+
+def test_configuration_through_app_key(app, client):
+    add_routes(app)
+    app[APP_KEY] = {
+        'RENDERERS': OrderedDict([
+            ('text/html', dummy_renderer),
+        ])
+    }
+    negotiation.setup(app)
+    res = client.get('/hello')
+    assert res.content_type == 'text/html'
+    assert res.body == b'<p>Hello world</p>'
+

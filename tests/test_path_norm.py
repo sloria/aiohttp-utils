@@ -1,7 +1,7 @@
 from aiohttp import web
 import pytest
 
-from aiohttp_utils import path_norm
+from aiohttp_utils import path_norm, APP_KEY
 from aiohttp_utils.path_norm import normalize_path_middleware
 
 from .conftest import make_dummy_handler
@@ -14,9 +14,8 @@ def app(loop):
 def client(create_client, app):
     return create_client(app)
 
-def configure_app(app, overrides=None, setup=True):
-    overrides = overrides or {}
 
+def add_routes(app):
     app.router.add_route('GET', '/', make_dummy_handler())
     app.router.add_route('GET', '/articles/', make_dummy_handler())
 
@@ -30,6 +29,9 @@ def configure_app(app, overrides=None, setup=True):
     app.router.add_route("GET", '/root/resource/', handler1)
     app.router.add_route("GET", "/root/resource/{tail:.*}", handler2)
 
+def configure_app(app, overrides=None, setup=True):
+    overrides = overrides or {}
+    add_routes(app)
     if setup:
         overrides = {key.upper(): value for key, value in overrides.items()}
         path_norm.setup(app, overrides)
@@ -116,4 +118,14 @@ class TestNormalizePathMiddleware:
         res = client.get('/root/resource')
         assert res.status_code == 301
         res = res.follow(expect_errors=True)
+        assert res.status_code == 404
+
+    def test_configuration_through_app_key(self, app, client):
+        add_routes(app)
+        app[APP_KEY] = {
+            'APPEND_SLASH': False
+        }
+
+        path_norm.setup(app)
+        res = client.get('/articles', expect_errors=True)
         assert res.status_code == 404
