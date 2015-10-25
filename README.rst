@@ -6,9 +6,9 @@ aiohttp_utils
 ..     :target: http://badge.fury.io/py/aiohttp_utils
 ..     :alt: Latest version
 
-.. .. image:: https://travis-ci.org/sloria/aiohttp_utils.png
-..     :target: https://travis-ci.org/sloria/aiohttp_utils
-..     :alt: Travis-CI
+.. image:: https://travis-ci.org/sloria/aiohttp_utils.png
+    :target: https://travis-ci.org/sloria/aiohttp_utils
+    :alt: Travis-CI
 
 **aiohttp_utils** provides handy utilities for building `aiohttp.web <http://aiohttp.readthedocs.org/>`_ applications.
 
