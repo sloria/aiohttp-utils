@@ -181,7 +181,7 @@ DEFAULTS = {
 def negotiation_middleware(
     renderers=DEFAULTS['RENDERERS'],
     negotiator=DEFAULTS['NEGOTIATOR'],
-    force_negotiation=True
+    force_negotiation=DEFAULTS['FORCE_NEGOTIATION']
 ):
     """Middleware which selects a renderer for a given request then renders
     a handler's data to a `aiohttp.web.Response`.
