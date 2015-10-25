@@ -4,7 +4,8 @@ import asyncio
 
 from aiohttp import web
 
-from aiohttp_utils.routing import ResourceRouter
+from aiohttp_utils.routing import ResourceRouter, add_route_context, add_resource_context
+from tests import views
 
 @pytest.fixture()
 def app(loop):
@@ -73,3 +74,69 @@ class TestResourceRouter:
 
         res = client.post('/child', expect_errors=True)
         assert res.status_code == 405
+
+
+class TestAddRouteContext:
+
+    def test_add_route_context_basic(self, app):
+        with add_route_context(app, views) as route:
+            route('GET', '/', 'index')
+            route('GET', '/projects/', 'list')
+            route('POST', '/projects', 'create')
+
+        assert app.router['index'].url() == '/'
+        assert app.router['list'].url() == '/projects/'
+        assert app.router['create'].url() == '/projects'
+
+    def test_add_route_raises_error_if_handler_not_found(self, app):
+        with add_route_context(app, views) as route:
+            with pytest.raises(AttributeError):
+                route('GET', '/', 'notfound')
+
+    def test_add_route_context_with_url_prefix(self, app):
+        with add_route_context(app, views, url_prefix='/api/') as route:
+            route('GET', '/', 'index')
+            route('GET', '/projects/', 'list')
+
+        assert app.router['index'].url() == '/api/'
+        assert app.router['list'].url() == '/api/projects/'
+
+    def test_add_route_context_with_name_prefix(self, app):
+        with add_route_context(app, views, name_prefix='api') as route:
+            route('GET', '/', 'index')
+            route('GET', '/projects/', 'list')
+
+        assert app.router['api.index'].url() == '/'
+        assert app.router['api.list'].url() == '/projects/'
+
+class TestAddResourceContext:
+
+    def test_add_resource_context_basic(self, app):
+        with add_resource_context(app, views) as route:
+            route('/articles/', 'ArticleResource')
+            route('/articles/{pk}', 'ArticleList')
+
+        assert app.router['ArticleResource:get'].url() == '/articles/'
+        assert app.router['ArticleResource:post'].url() == '/articles/'
+        assert app.router['ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+
+    def test_add_resource_context_with_url_prefix(self, app):
+        with add_resource_context(app, views, url_prefix='/api/') as route:
+            route('/articles/', 'ArticleResource')
+
+        assert app.router['ArticleResource:get'].url() == '/api/articles/'
+        assert app.router['ArticleResource:post'].url() == '/api/articles/'
+
+    def test_add_resource_context_with_name_prefix(self, app):
+        with add_resource_context(app, views, name_prefix='api') as route:
+            route('/articles/', 'ArticleResource')
+
+        assert app.router['api.ArticleResource:get'].url() == '/articles/'
+        assert app.router['api.ArticleResource:post'].url() == '/articles/'
+
+    def test_add_resource_context_with_name_prefix_and_override(self, app):
+        with add_resource_context(app, views, name_prefix='api') as route:
+            route('/articles/', 'ArticleResource', names={'get': 'list_articles'})
+
+        assert app.router['api.list_articles'].url() == '/articles/'
+        assert app.router['api.ArticleResource:post'].url() == '/articles/'

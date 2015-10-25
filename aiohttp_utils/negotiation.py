@@ -157,10 +157,13 @@ render_json = JSONRenderer()
 
 #: Default configuration
 DEFAULTS = {
+    # Function that selects a renderer
     'NEGOTIATOR': select_renderer,
     'RENDERERS': OrderedDict([
         ('application/json', render_json),
     ]),
+    # If True, use the first renderer in RENDERERS if the
+    # client sends an unsupported media type
     'FORCE_NEGOTIATION': True,
 }
 

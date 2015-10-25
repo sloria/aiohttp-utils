@@ -6,9 +6,10 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
 **aiohttp_utils** provides handy utilities for building `aiohttp.web <http://aiohttp.readthedocs.org/>`_ applications.
 
 
-* Class-based handlers ("resources")
-* Content negotiation (JSON rendering by default)
+* Method-based handlers ("resources")
+* Content negotiation with JSON rendering by default
 * Local development server with auto-reloading
+* And more
 
 This package is a toolkit; you can use as much (or as little) of it as you need.
 
@@ -19,7 +20,7 @@ This package is a toolkit; you can use as much (or as little) of it as you need.
 
     app = web.Application(router=routing.ResourceRouter())
 
-    # Class-based handlers
+    # Method-based handlers
     class HelloResource:
 
         async def get(self, request):
@@ -30,6 +31,7 @@ This package is a toolkit; you can use as much (or as little) of it as you need.
 
 
     app.router.add_resource('/', HelloResource())
+
     # Content negotiation
     negotiation.setup(app, {
         'RENDERERS': {
