@@ -5,6 +5,7 @@ from setuptools import setup, find_packages
 REQUIRES = [
     'aiohttp',
     'python-mimeparse',
+    'gunicorn',
 ]
 
 def find_version(fname):
