@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import asyncio
+
+from aiohttp import web
 import pytest
 
 from webtest_aiohttp import TestApp
@@ -20,3 +22,10 @@ def create_client(app):
         kwargs.setdefault('lint', False)
         return TestApp(app, *args, **kwargs)
     return maker
+
+
+def make_dummy_handler(**kwargs):
+    @asyncio.coroutine
+    def dummy(request):
+        return web.Response(**kwargs)
+    return dummy

@@ -207,7 +207,7 @@ def negotiation_middleware(
 
 
 def setup(app: web.Application, overrides: dict=None):
-    """Set up the negotiation middleware. Reads configuration from
+    """Set up the negotiation middleware. Saves configuration to
     app['aiohttp_utils'].
 
     :param aiohttp.web.Application: Application to set up.

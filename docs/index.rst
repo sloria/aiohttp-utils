@@ -54,8 +54,9 @@ Modules
 .. toctree::
     :maxdepth: 1
 
-    modules/routing
     modules/negotiation
+    modules/path_norm
+    modules/routing
     modules/runner
 
 Project info
