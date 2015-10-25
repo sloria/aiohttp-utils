@@ -1,6 +1,7 @@
 """Routing utilities."""
 from collections.abc import Mapping, Iterable
 from contextlib import contextmanager
+import importlib
 
 from aiohttp import web
 
@@ -95,7 +96,17 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
             route('POST', '/articles/', views.create_article)
 
         app.router['articles.list_articles'].url()  # /api/articles/
+
+    If you prefer, you can also pass module and handler names as strings. ::
+
+        with add_route_context(app, module='myapp.articles.views',
+                               url_prefix='/api/', name_prefix='articles') as route:
+            route('GET', '/articles/', 'list_articles')
+            route('POST', '/articles/', 'create_article')
     """
+    if isinstance(module, (str, bytes)):
+        module = importlib.import_module(module)
+
     def add_route(method, path, handler, name=None):
         """
         :param str method: HTTP method.
@@ -127,12 +138,14 @@ def get_supported_method_names(resource):
     ]
 
 @contextmanager
-def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
+def add_resource_context(
+    app, module=None, url_prefix=None, name_prefix=None, make_resource=lambda cls: cls()
+):
     """Context manager which yields a function for adding multiple resources from a given module
     to an app using `ResourceRouter <aiohttp_utils.routing.ResourceRouter>`.
 
     Example:
-    ::
+    .. code-block:: python
 
         # myapp/articles/views.py
         class ArticleList:
@@ -143,7 +156,7 @@ def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
             async def get(self, request):
                 return web.Response(b'article detail...')
 
-    ::
+    .. code-block:: python
 
         # myapp/app.py
         from myapp.articles import views
@@ -154,19 +167,53 @@ def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
 
         app.router['ArticleList:get'].url()  # /api/articles/
         app.router['ArticleDetail:get'].url(parts={'pk': 42})  # /api/articles/42
+
+    If you prefer, you can also pass module and class names as strings. ::
+
+        with add_resource_context(app, module='myapp.articles.views',
+                                  url_prefix='/api/') as route:
+            route('/articles/', 'ArticleList')
+            route('/articles/{pk}', 'ArticleDetail')
+
+    .. note::
+        If passing class names, the resource classes will be instantiated with no
+        arguments. You can change this behavior by overriding ``make_resource``.
+
+        .. code-block:: python
+
+            # myapp/authors/views.py
+            class AuthorList:
+                def __init__(self, db):
+                    self.db = db
+
+                async def get(self, request):
+                    # Fetch authors from self.db...
+
+        .. code-block:: python
+
+            # myapp/app.py
+            from myapp.database import db
+
+            with add_resource_context(app, module='myapp.authors.views',
+                                    url_prefix='/api/',
+                                    make_resource=lambda cls: cls(db=db)) as route:
+                route('/authors/', 'AuthorList')
     """
     assert isinstance(app.router, ResourceRouter), 'app must be using ResourceRouter'
+
+    if isinstance(module, (str, bytes)):
+        module = importlib.import_module(module)
 
     def get_base_name(resource, method_name, names):
         return names.get(method_name,
                          app.router.get_default_handler_name(resource, method_name))
 
+    default_make_resource = make_resource
+
     def add_route(
-        path: str,
-        resource,
-        names: Mapping=None,
-        make_resource=lambda cls: cls()
+        path: str, resource, names: Mapping=None, make_resource=None
     ):
+        make_resource = make_resource or default_make_resource
         names = names or {}
         if isinstance(resource, (str, bytes)):
             if not module:

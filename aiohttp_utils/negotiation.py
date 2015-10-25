@@ -33,7 +33,7 @@
 .. note::
 
     Handlers must return `aiohttp_utils.negotiation.Response` (which can be imported from
-    the top-level `aiohttp` module) for data
+    the top-level `aiohttp_utils` module) for data
     to be properly negotiated. `aiohttp_utils.negotiation.Response` is the
     same as `aiohttp.web.Response`, except that its first
     argument is `data`, which is the data to be negotiated.

@@ -18,7 +18,7 @@ aiohttp_utils
 * Local development server with auto-reloading
 * And more
 
-This package is a toolkit; you can use as much (or as little) of it as you need.
+**Everything is optional**. You can use as much (or as little) of the toolkit as you need.
 
 .. code-block:: python
 

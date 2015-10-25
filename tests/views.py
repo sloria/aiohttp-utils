@@ -34,3 +34,13 @@ class ArticleList:
     @coroutine
     def post(self, request):
         return web.Response()
+
+
+class AuthorList:
+
+    def __init__(self, db):
+        self.db = db
+
+    @coroutine
+    def get(self, request):
+        return web.Response()

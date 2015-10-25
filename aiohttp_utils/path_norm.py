@@ -8,7 +8,7 @@
     from aiohttp_utils import path_norm
 
     path_norm.setup(app, {
-        'APPEND_SLASHES': True,
+        'APPEND_SLASH': True,
         'MERGE_SLASHES': True
     })
 """

@@ -98,6 +98,16 @@ class TestAddRouteContext:
         assert app.router['list_projects'].url() == '/projects/'
         assert app.router['create_projects'].url() == '/projects'
 
+    def test_passing_module_and_handlers_as_strings(self, app):
+        with add_route_context(app, module='tests.views') as route:
+            route('GET', '/', 'index')
+            route('GET', '/projects/', 'list_projects')
+            route('POST', '/projects', 'create_projects')
+
+        assert app.router['index'].url() == '/'
+        assert app.router['list_projects'].url() == '/projects/'
+        assert app.router['create_projects'].url() == '/projects'
+
     def test_route_name_override(self, app):
         with add_route_context(app) as route:
             route('GET', '/', views.index, name='home')
@@ -143,7 +153,26 @@ class TestAddResourceContext:
 
         assert app.router['ArticleResource:get'].url() == '/articles/'
         assert app.router['ArticleResource:post'].url() == '/articles/'
+
+    def test_passing_module_and_resources_as_strings(self, app):
+        with add_resource_context(app, module='tests.views') as route:
+            route('/articles/', 'ArticleResource')
+            route('/articles/{pk}', 'ArticleList')
+
+        assert app.router['ArticleResource:get'].url() == '/articles/'
+        assert app.router['ArticleResource:post'].url() == '/articles/'
         assert app.router['ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+
+    def test_make_resource_override(self, app):
+        db = {}
+        with add_resource_context(app, module='tests.views') as route:
+            route('/authors/', 'AuthorList', make_resource=lambda cls: cls(db=db))
+
+    def test_make_resource_override_on_context_manager(self, app):
+        db = {}
+        with add_resource_context(app, module='tests.views',
+                                  make_resource=lambda cls: cls(db=db)) as route:
+            route('/authors/', 'AuthorList')
 
     def test_add_resource_context_passing_classes_with_prefix(self, app):
         with add_resource_context(app, name_prefix='articles') as route:
