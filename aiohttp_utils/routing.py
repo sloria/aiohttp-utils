@@ -67,43 +67,56 @@ class ResourceRouter(web.UrlDispatcher):
                 name = names.get(method_name, self.get_default_handler_name(resource, method_name))
                 self.add_route(method_name.upper(), path, handler, name=name)
 
-def make_url(url, url_prefix=None):
-    return ('/'.join((url_prefix.rstrip('/'), url.lstrip('/')))
+def make_path(path, url_prefix=None):
+    return ('/'.join((url_prefix.rstrip('/'), path.lstrip('/')))
             if url_prefix
-            else url)
+            else path)
 
 @contextmanager
-def add_route_context(app, module, url_prefix=None, name_prefix=None):
+def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
     """Context manager which yields a function for adding multiple routes from a given module.
 
     Example:
     ::
         # myapp/articles/views.py
 
-        async def list(request):
+        async def list_articles(request):
             return web.Response(b'article list...')
 
-        async def create(request):
+        async def create_article(request):
             return web.Response(b'created article...')
-
-        from myapp.articles import views
 
     ::
 
         # myapp/app.py
 
-        with add_route_context(app, views,
-                               url_prefix='/api/', name_prefix='articles') as route:
-            route('GET', '/articles/', 'list')
-            route('POST', '/articles/', 'create')
+        from myapp.articles import views
 
-        app.router['articles.list'].url()  # /api/articles/
+        with add_route_context(app, url_prefix='/api/', name_prefix='articles') as route:
+            route('GET', '/articles/', views.list_articles)
+            route('POST', '/articles/', views.create_article)
+
+        app.router['articles.list_articles'].url()  # /api/articles/
     """
-    def add_route(method, url, name):
-        view = getattr(module, name)
-        url = make_url(url, url_prefix)
+    def add_route(method, path, handler):
+        """
+        :param str method: HTTP method.
+        :param str path: Path for the route.
+        :param handler: A handler function or a name of a handler function contained
+            in `module`.
+        """
+        if isinstance(handler, (str, bytes)):
+            if not module:
+                raise ValueError(
+                    'Must pass module to add_route_context if passing handler name strings.'
+                )
+            name = handler
+            handler = getattr(module, handler)
+        else:
+            name = handler.__name__
+        path = make_path(path, url_prefix)
         name = '.'.join((name_prefix, name)) if name_prefix else name
-        return app.router.add_route(method, url, view, name=name)
+        return app.router.add_route(method, path, handler, name=name)
     yield add_route
 
 
@@ -114,7 +127,7 @@ def get_supported_method_names(resource):
     ]
 
 @contextmanager
-def add_resource_context(app, module, url_prefix=None, name_prefix=None):
+def add_resource_context(app, module=None, url_prefix=None, name_prefix=None):
     """Context manager which yields a function for adding multiple resources from a given module
     to an app using `ResourceRouter <aiohttp_utils.routing.ResourceRouter>`.
 
@@ -137,9 +150,9 @@ def add_resource_context(app, module, url_prefix=None, name_prefix=None):
 
         from myapp.articles import views
 
-        with add_resource_context(app, views, url_prefix='/api/') as route:
-            route('/articles/', 'ArticleList')
-            route('/articles/{pk}', 'ArticleDetail')
+        with add_resource_context(app, url_prefix='/api/') as route:
+            route('/articles/', views.ArticleList())
+            route('/articles/{pk}', views.ArticleDetail())
 
         app.router['ArticleList:get'].url()  # /api/articles/
         app.router['ArticleDetail:get'].url(parts={'pk': 42})  # /api/articles/42
@@ -150,15 +163,20 @@ def add_resource_context(app, module, url_prefix=None, name_prefix=None):
                          app.router.get_default_handler_name(resource, method_name))
 
     def add_route(
-        url: str,
-        resource_name: str,
+        path: str,
+        resource,
         names: Mapping=None,
         make_resource=lambda cls: cls()
     ):
         names = names or {}
-        resource_cls = getattr(module, resource_name)
-        resource = make_resource(resource_cls)
-        url = make_url(url, url_prefix)
+        if isinstance(resource, (str, bytes)):
+            if not module:
+                raise ValueError(
+                    'Must pass module to add_route_context if passing resource name strings.'
+                )
+            resource_cls = getattr(module, resource)
+            resource = make_resource(resource_cls)
+        path = make_path(path, url_prefix)
         if name_prefix:
             supported_method_names = get_supported_method_names(resource)
             names = {
@@ -167,5 +185,5 @@ def add_resource_context(app, module, url_prefix=None, name_prefix=None):
                 )
                 for method_name in supported_method_names
             }
-        return app.router.add_resource(url, resource, names=names)
+        return app.router.add_resource(path, resource, names=names)
     yield add_route

@@ -81,12 +81,22 @@ class TestAddRouteContext:
     def test_add_route_context_basic(self, app):
         with add_route_context(app, views) as route:
             route('GET', '/', 'index')
-            route('GET', '/projects/', 'list')
-            route('POST', '/projects', 'create')
+            route('GET', '/projects/', 'list_projects')
+            route('POST', '/projects', 'create_projects')
 
         assert app.router['index'].url() == '/'
-        assert app.router['list'].url() == '/projects/'
-        assert app.router['create'].url() == '/projects'
+        assert app.router['list_projects'].url() == '/projects/'
+        assert app.router['create_projects'].url() == '/projects'
+
+    def test_add_route_context_passing_handler_functions(self, app):
+        with add_route_context(app) as route:
+            route('GET', '/', views.index)
+            route('GET', '/projects/', views.list_projects)
+            route('POST', '/projects', views.create_projects)
+
+        assert app.router['index'].url() == '/'
+        assert app.router['list_projects'].url() == '/projects/'
+        assert app.router['create_projects'].url() == '/projects'
 
     def test_add_route_raises_error_if_handler_not_found(self, app):
         with add_route_context(app, views) as route:
@@ -96,18 +106,18 @@ class TestAddRouteContext:
     def test_add_route_context_with_url_prefix(self, app):
         with add_route_context(app, views, url_prefix='/api/') as route:
             route('GET', '/', 'index')
-            route('GET', '/projects/', 'list')
+            route('GET', '/projects/', 'list_projects')
 
         assert app.router['index'].url() == '/api/'
-        assert app.router['list'].url() == '/api/projects/'
+        assert app.router['list_projects'].url() == '/api/projects/'
 
     def test_add_route_context_with_name_prefix(self, app):
         with add_route_context(app, views, name_prefix='api') as route:
             route('GET', '/', 'index')
-            route('GET', '/projects/', 'list')
+            route('GET', '/projects/', 'list_projects')
 
         assert app.router['api.index'].url() == '/'
-        assert app.router['api.list'].url() == '/projects/'
+        assert app.router['api.list_projects'].url() == '/projects/'
 
 class TestAddResourceContext:
 
@@ -119,6 +129,24 @@ class TestAddResourceContext:
         assert app.router['ArticleResource:get'].url() == '/articles/'
         assert app.router['ArticleResource:post'].url() == '/articles/'
         assert app.router['ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+
+    def test_add_resource_context_passing_classes(self, app):
+        with add_resource_context(app) as route:
+            route('/articles/', views.ArticleResource())
+            route('/articles/{pk}', views.ArticleList())
+
+        assert app.router['ArticleResource:get'].url() == '/articles/'
+        assert app.router['ArticleResource:post'].url() == '/articles/'
+        assert app.router['ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+
+    def test_add_resource_context_passing_classes_with_prefix(self, app):
+        with add_resource_context(app, name_prefix='articles') as route:
+            route('/articles/', views.ArticleResource())
+            route('/articles/{pk}', views.ArticleList())
+
+        assert app.router['articles.ArticleResource:get'].url() == '/articles/'
+        assert app.router['articles.ArticleResource:post'].url() == '/articles/'
+        assert app.router['articles.ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
 
     def test_add_resource_context_with_url_prefix(self, app):
         with add_resource_context(app, views, url_prefix='/api/') as route:

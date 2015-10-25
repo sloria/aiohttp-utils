@@ -8,11 +8,11 @@ def index(request):
     return web.Response()
 
 @coroutine
-def list(request):
+def list_projects(request):
     return web.Response()
 
 @coroutine
-def create(request):
+def create_projects(request):
     return web.Response()
 
 class ArticleResource:
