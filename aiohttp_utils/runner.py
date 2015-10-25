@@ -1,5 +1,5 @@
 """Run an `aiohttp.web.Application` on a local development server. If
-:attr:`debug` is set on the application, the server will automatically
+:attr:`debug` is set to `True` on the application, the server will automatically
 reload when code changes.
 ::
 
@@ -7,6 +7,7 @@ reload when code changes.
     from aiohttp_utils import runner
 
     app = web.Application()
+    app.debug = True
     # ...
     runner.run(app, app_uri='path.to.module:app', port=5000)
 """
@@ -83,8 +84,8 @@ class Runner:
 def run(app, **kwargs):
     """Run an `aiohttp.web.Application` using gunicorn.
 
-    :param web.Application app: The app to run.
-    :param web.Application app_uri: Import path to `app`. Takes the form
+    :param aiohttp.web.Application app: The app to run.
+    :param str app_uri: Import path to `app`. Takes the form
         $(MODULE_NAME):$(VARIABLE_NAME).
         The module name can be a full dotted path.
         The variable name refers to the `aiohttp.web.Application`.

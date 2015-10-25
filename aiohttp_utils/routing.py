@@ -5,10 +5,9 @@ from contextlib import contextmanager
 from aiohttp import web
 
 class ResourceRouter(web.UrlDispatcher):
-    """Router with an :meth:`add_resource` method for registering "resource classes". A resource
-    class is simply a class with methods that are HTTP method names.
-
-    Includes all the same methods as `aiohttp.web.UrlDispatcher`.
+    """Router with an :meth:`add_resource` method for registering method-based handlers,
+    a.k.a "resources". Includes all the methods `aiohttp.web.UrlDispatcher` with the addition
+    of `add_resource`.
 
     Example: ::
 
@@ -77,9 +76,21 @@ def make_url(url, url_prefix=None):
 def add_route_context(app, module, url_prefix=None, name_prefix=None):
     """Context manager which yields a function for adding multiple routes from a given module.
 
-    Example: ::
+    Example:
+    ::
+        # myapp/articles/views.py
+
+        async def list(request):
+            return web.Response(b'article list...')
+
+        async def create(request):
+            return web.Response(b'created article...')
 
         from myapp.articles import views
+
+    ::
+
+        # myapp/app.py
 
         with add_route_context(app, views,
                                url_prefix='/api/', name_prefix='articles') as route:
@@ -107,7 +118,22 @@ def add_resource_context(app, module, url_prefix=None, name_prefix=None):
     """Context manager which yields a function for adding multiple resources from a given module
     to an app using `ResourceRouter <aiohttp_utils.routing.ResourceRouter>`.
 
-    Example: ::
+    Example:
+    ::
+
+        # myapp/articles/views.py
+
+        class ArticleList:
+            async def get(self, request):
+                return web.Response(b'article list...')
+
+        class ArticleDetail:
+            async def get(self, request):
+                return web.Response(b'article detail...')
+
+    ::
+
+        # myapp/app.py
 
         from myapp.articles import views
 

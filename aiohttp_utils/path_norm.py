@@ -1,7 +1,7 @@
 """Middleware for normalizing paths.
 
-- Appends slashes missing trailing slashes (/path -> /path/)
-- Removes double-slashes (/path// -> /path/)
+- Appends missing trailing slashes ("/path" -> "/path/")
+- Removes double-slashes ("/path//" -> "/path/")
 
 .. code-block:: python
 
