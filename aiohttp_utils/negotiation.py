@@ -109,6 +109,16 @@ import mimeparse
 
 from .constants import APP_KEY
 
+
+__all__ = (
+    'setup',
+    'negotiation_middleware',
+    'Response',
+    'select_renderer',
+    'JSONRenderer',
+    'render_json'
+)
+
 class Response(web.Response):
     """Same as `aiohttp.web.Response`, except that the constructor takes a `data` argument,
     which is the data to be negotiated by the

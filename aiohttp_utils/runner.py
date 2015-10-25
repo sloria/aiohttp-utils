@@ -16,6 +16,13 @@ from aiohttp.worker import GunicornWebWorker as BaseWorker
 from gunicorn.app.wsgiapp import WSGIApplication as BaseApplication
 from gunicorn.util import import_app
 
+__all__ = (
+    'run',
+    'Runner',
+    'GunicornApp',
+    'GunicornWorker',
+)
+
 
 class GunicornWorker(BaseWorker):
     # Override to set the app's loop to the worker's loop

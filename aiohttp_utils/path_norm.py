@@ -21,6 +21,13 @@ from aiohttp.web_urldispatcher import (
 
 from .constants import APP_KEY
 
+__all__ = (
+    'setup',
+    'DEFAULTS',
+    'NormalizePathMiddleware',
+    'normalize_path_middleware',
+)
+
 DEFAULTS = {
     # Whether to append trailing slashes to URLs.
     'APPEND_SLASH': True,

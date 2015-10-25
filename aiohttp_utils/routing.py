@@ -5,6 +5,12 @@ import importlib
 
 from aiohttp import web
 
+__all__ = (
+    'ResourceRouter',
+    'add_route_context',
+    'add_resource_context',
+)
+
 class ResourceRouter(web.UrlDispatcher):
     """Router with an :meth:`add_resource` method for registering method-based handlers,
     a.k.a "resources". Includes all the methods `aiohttp.web.UrlDispatcher` with the addition
