@@ -20,7 +20,7 @@ Try it out:
 from asyncio import coroutine
 
 from aiohttp import web
-from aiohttp_utils import Response, routing, negotiation, runner, path_norm
+from aiohttp_utils import Response, routing, negotiation, run, path_norm
 
 app = web.Application(router=routing.ResourceRouter())
 
@@ -47,7 +47,7 @@ negotiation.setup(app)
 path_norm.setup(app)
 
 if __name__ == "__main__":
-    runner.run(
+    run(
         app,
         app_uri="examples.kitchen_sink:app",
         reload=True,

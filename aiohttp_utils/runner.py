@@ -4,12 +4,11 @@ reload when code changes.
 ::
 
     from aiohttp import web
-    from aiohttp_utils import runner
+    from aiohttp_utils import run
 
     app = web.Application()
-    app.debug = True
     # ...
-    runner.run(app, app_uri='path.to.module:app', port=5000)
+    run(app, app_uri='path.to.module:app', reload=True, port=5000)
 """
 from aiohttp import web
 from aiohttp.worker import GunicornWebWorker as BaseWorker
@@ -64,7 +63,7 @@ class Runner:
         self.app_uri = app_uri
         self.host = host
         self.port = port
-        self.reload = reload or app.debug
+        self.reload = reload if reload is not None else app.debug
         if self.reload and not self.app_uri:
             raise RuntimeError('"reload" option requires "app_uri"')
         self.options = options

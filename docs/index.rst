@@ -16,7 +16,7 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
 .. code-block:: python
 
     from aiohttp import web
-    from aiohttp_utils import Response, routing, negotiation, runner
+    from aiohttp_utils import Response, routing, negotiation, run
 
     app = web.Application(router=routing.ResourceRouter())
 
@@ -41,7 +41,7 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
 
     if __name__ == '__main__':
         # Development server
-        runner.run(
+        run(
             app,
             app_uri='hello.app:app',
             reload=True,

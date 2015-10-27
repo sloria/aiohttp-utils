@@ -23,7 +23,7 @@ aiohttp_utils
 .. code-block:: python
 
     from aiohttp import web
-    from aiohttp_utils import Response, routing, negotiation, runner
+    from aiohttp_utils import Response, routing, negotiation, run
 
     app = web.Application(router=routing.ResourceRouter())
 
@@ -48,7 +48,7 @@ aiohttp_utils
 
     if __name__ == '__main__':
         # Development server
-        runner.run(
+        run(
             app,
             app_uri='hello.app:app',
             reload=True,
