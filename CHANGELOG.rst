@@ -9,6 +9,7 @@ Changelog
 - [negotiation] *Backwards-incompatible*: Renderer and negotiator functions receive a third argument, ``handler`` (the next handler in the middleware chain).
 - [runner] Make ``run`` importable from top-level ``aiohttp_utils`` module.
 - [runner] Fix behavior when passing ``reload=False`` when ``app.debug=True``
+- Improved docs.
 
 0.1.0 (2015-10-25)
 ==================
