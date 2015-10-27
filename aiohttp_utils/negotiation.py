@@ -1,5 +1,8 @@
 """Content negotiation is the process of selecting an appropriate
-representation (e.g. JSON, HTML, etc.) to return to a client.
+representation (e.g. JSON, HTML, etc.) to return to a client based on the client's and/or server's
+preferences.
+
+If no custom renderers are supplied, this plugin will render responses to JSON.
 
 .. code-block:: python
 
@@ -8,43 +11,19 @@ representation (e.g. JSON, HTML, etc.) to return to a client.
     from aiohttp import web
     from aiohttp_utils import negotiation, Response
 
-    app = web.Application()
-
     async def handler(request):
         return Response({'message': "Let's negotiate"})
 
+    app = web.Application()
+    app.router.add_route('GET', '/', handler)
 
-    async def init(loop, port=5000):
-        app = web.Application(loop=loop)
-        app.router.add_route('GET', '/', handler)
+    # No configuration: renders to JSON by default
+    negotiation.setup(app)
 
-        negotiation.setup(app)
-
-        srv = await loop.create_server(
-            app.make_handler(), '0.0.0.0', 5000)
-        return srv
-
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(init(loop))
-    try:
-        loop.run_forever()
-    except KeyboardInterrupt:
-        pass
-
-.. note::
-
-    Handlers must return `aiohttp_utils.negotiation.Response` (which can be imported from
-    the top-level `aiohttp_utils` module) for data
-    to be properly negotiated. `aiohttp_utils.negotiation.Response` is the
-    same as `aiohttp.web.Response`, except that its first
-    argument is `data`, which is the data to be negotiated.
-
-
-The middleware will render responses to JSON by default.
-
-Example with httpie:
+We can consume the app with httpie.
 ::
 
+    $ pip install httpie
     $ http :5000/
     HTTP/1.1 200 OK
     CONNECTION: keep-alive
@@ -56,6 +35,14 @@ Example with httpie:
     {
         "message": "Let's negotiate"
     }
+
+.. note::
+
+    Handlers **MUST** return an `aiohttp_utils.negotiation.Response` (which can be imported from
+    the top-level `aiohttp_utils` module) for data
+    to be properly negotiated. `aiohttp_utils.negotiation.Response` is the
+    same as `aiohttp.web.Response`, except that its first
+    argument is `data`, the data to be negotiated.
 
 Customizing negotiation
 =======================
@@ -70,7 +57,8 @@ Example:
 
 .. code-block:: python
 
-    def render_text(request, data):
+    # A simple text renderer
+    def render_text(request, data, handler):
         return data.encode(request.charset)
 
     # OR, if you need to parametrize your renderer, you can use a class
@@ -86,23 +74,23 @@ Example:
     render_text_utf16 = TextRenderer('utf-16')
 
 You can then pass your renderers to `setup <aiohttp_utils.negotiation.setup>`
-with a corresponding mediatype.
-
-.. note::
-
-    We use an `OrderedDict <collections.OrderedDict>` because priority is given to
-    the first specified renderer when the client passes an unsupported media type.
+with a corresponding media type.
 
 .. code-block:: python
 
+    from collections import OrderedDict
     from aiohttp_utils import negotiation
 
-    negotiation.setup(app, {
-        'RENDERERS': OrderedDict([
-            ('text/plain', render_text),
-            ('application/json', negotiation.render_json),
-        ])
-    })
+    negotiation.setup(app, renderers=OrderedDict([
+        ('text/plain', render_text),
+        ('application/json', negotiation.render_json),
+    ]))
+
+.. note::
+
+    We use an `OrderedDict <collections.OrderedDict>` of renderers because priority is given to
+    the first specified renderer when the client passes an unsupported media type.
+
 """
 from collections import OrderedDict
 import asyncio
@@ -162,11 +150,14 @@ class JSONRenderer:
     """Callable object which renders to JSON."""
     json_module = pyjson
 
+    def __repr__(self):
+        return '<JSONRenderer()>'
+
     def __call__(self, request, data, handler):
         return self.json_module.dumps(data).encode('utf-8')
 
 #: Render data to JSON. Singleton `JSONRenderer`. This can be passed to the
-#: ``RENDERERS``` configuration option, e.g. ``('application/json', render_json)``.
+#: ``RENDERERS`` configuration option, e.g. ``('application/json', render_json)``.
 render_json = JSONRenderer()
 
 ##### Main API #####
@@ -228,11 +219,11 @@ def setup(
     renderers: OrderedDict=DEFAULTS['RENDERERS'],
     force_negotiation: bool=DEFAULTS['FORCE_NEGOTIATION']
 ):
-    """Set up the negotiation middleware. Saves configuration to
-    app['aiohttp_utils'].
+    """Set up the negotiation middleware. Reads configuration from
+    ``app['AIOHTTP_UTILS']``.
 
     :param app: Application to set up.
-    :param negotiator: Function that selects a renderer, given a
+    :param negotiator: Function that selects a renderer given a
         request, a dict of renderers, and a ``force`` parameter (whether to return
         a renderer even if the client passes an unsupported media type).
     :param renderers: Mapping of mediatypes to callable renderers.

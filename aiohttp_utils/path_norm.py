@@ -53,7 +53,7 @@ def resolve2(router, method, path):
             return _NotFoundMatchInfo()
 
 class NormalizePathMiddleware:
-    """Middleware for path normalization
+    """Middleware for path normalization.
 
     :param bool append_slash: Whether to append trailing slashes to URLs.
     :param bool merge_slashes: Whether to normalize double-slashes to single-slashes,
@@ -116,12 +116,12 @@ def setup(
     append_slash: bool=DEFAULTS['APPEND_SLASH'],
     merge_slashes: bool=DEFAULTS['MERGE_SLASHES']
 ):
-    """Set up the path normalization middleware. Saves configuration to
-    app['aiohttp_utils'].
+    """Set up the path normalization middleware. Reads configuration from
+    ``app['AIOHTTP_UTILS']``.
 
-    :param aiohttp.web.Application: Application to set up.
-    :param bool append_slash: Whether to append trailing slashes to URLs.
-    :param bool merge_slashes: Whether to merge multiple slashes in URLs to a single
+    :param app: Application to set up.
+    :param append_slash: Whether to append trailing slashes to URLs.
+    :param merge_slashes: Whether to merge multiple slashes in URLs to a single
         slash
     """
     config = app.get(APP_KEY, {})
