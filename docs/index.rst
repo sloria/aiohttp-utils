@@ -49,15 +49,18 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
         )
 
 Install
-=======
+-------
 ::
 
     $ pip install aiohttp_utils
 
-Utilities
----------
 
-Below is a listing of available utility modules.
+**Ready to get started?** Go on to one of the the usage guides below  or check out some `examples <https://github.com/sloria/aiohttp_utils/tree/master/examples>`_.
+
+Guides
+------
+
+Below are usage guides for each of the modules.
 
 .. toctree::
     :maxdepth: 1
