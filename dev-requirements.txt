@@ -5,6 +5,7 @@ invoke
 pytest
 tox>=1.5.0
 webtest-aiohttp
+Mako  # Used in the integration tests
 
 # Packaging
 wheel
