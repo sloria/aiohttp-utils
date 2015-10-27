@@ -37,11 +37,9 @@ def configure_app(app, overrides=None, setup=False):
     add_routes(app)
 
     if setup:
-        overrides = {key.upper(): val for key, val in overrides.items()}
-        negotiation.setup(app, overrides=overrides)
+        negotiation.setup(app, **overrides)
     else:
-        kwargs = {key.lower(): value for key, value in overrides}
-        middleware = negotiation.negotiation_middleware(**kwargs)
+        middleware = negotiation.negotiation_middleware(**overrides)
         app.middlewares.append(middleware)
 
 @pytest.mark.parametrize('setup',
@@ -73,7 +71,7 @@ def dummy_renderer(request, data):
 
 def test_renderer_override(app, client):
     configure_app(app, overrides={
-        'RENDERERS': OrderedDict([
+        'renderers': OrderedDict([
             ('text/html', dummy_renderer),
         ])
     }, setup=True)
@@ -84,7 +82,7 @@ def test_renderer_override(app, client):
 
 def test_renderer_override_multiple_classes(app, client):
     configure_app(app, overrides={
-        'RENDERERS': OrderedDict([
+        'renderers': OrderedDict([
             ('text/html', dummy_renderer),
             ('application/json', negotiation.render_json),
             ('application/vnd.api+json', negotiation.render_json),
@@ -105,7 +103,7 @@ def test_renderer_override_multiple_classes(app, client):
 
 def test_renderer_override_force(app, client):
     configure_app(app, overrides={
-        'FORCE_NEGOTIATION': False,
+        'force_negotiation': False,
     }, setup=True)
 
     res = client.get('/hello', headers={'Accept': 'text/notsupported'}, expect_errors=True)
@@ -113,7 +111,7 @@ def test_renderer_override_force(app, client):
 
 def test_nonordered_dict_of_renderers(app, client):
     configure_app(app, overrides={
-        'RENDERERS': {
+        'renderers': {
             'application/json': negotiation.render_json
         }
     }, setup=True)
