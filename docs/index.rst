@@ -11,7 +11,7 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
 * Local development server with auto-reloading
 * And more
 
-**Everything is optional**. You can use as much (or as little) of the toolkit as you need.
+**Everything is optional**. You can use as much (or as little) of this toolkit as you need.
 
 .. code-block:: python
 
@@ -77,4 +77,5 @@ Project info
    :maxdepth: 1
 
    changelog
+   versioning
    license
