@@ -128,9 +128,10 @@ class Response(web.Response):
 
 ##### Negotiation strategies #####
 
-def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
+def select_renderer(request: web.Request, renderers: OrderedDict, handler, force=True):
     """
-    Given a request and a list of renderers, return a two-tuple of:
+    Given a request, a list of renderers, the current handler, and the ``force`` configuration
+    option, return a two-tuple of:
     (media type, render callable). Uses mimeparse to find the best media
     type match from the ACCEPT header.
     """
@@ -186,9 +187,10 @@ def negotiation_middleware(
         @asyncio.coroutine
         def middleware(request):
             content_type, renderer = negotiator(
-                request=request,
-                renderers=renderers,
-                force=force_negotiation
+                request,
+                renderers,
+                handler,
+                force_negotiation,
             )
             request['selected_media_type'] = content_type
             response = yield from handler(request)
