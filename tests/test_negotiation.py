@@ -130,4 +130,3 @@ def test_configuration_through_app_key(app, client):
     res = client.get('/hello')
     assert res.content_type == 'text/html'
     assert res.body == b'<p>Hello world</p>'
-

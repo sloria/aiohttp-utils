@@ -13,6 +13,7 @@ extensions = [
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
     'sphinx_issues',
+    'sphinx_autodoc_annotation',
 ]
 
 primary_domain = 'py'

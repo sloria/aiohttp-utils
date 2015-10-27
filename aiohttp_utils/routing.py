@@ -1,5 +1,5 @@
 """Routing utilities."""
-from collections.abc import Mapping, Iterable
+from collections.abc import Mapping
 from contextlib import contextmanager
 import importlib
 
@@ -57,13 +57,13 @@ class ResourceRouter(web.UrlDispatcher):
     def get_default_handler_name(self, resource, method_name: str):
         return '{resource.__class__.__name__}:{method_name}'.format(**locals())
 
-    def add_resource(self, path: str, resource, methods: Iterable=tuple(), names: Mapping=None):
+    def add_resource(self, path: str, resource, methods: tuple=tuple(), names: Mapping=None):
         """Add routes by an resource instance's methods.
 
-        :param str path: route path. Should be started with slash (``'/'``).
+        :param path: route path. Should be started with slash (``'/'``).
         :param resource: A "resource" instance. May be an instance of a plain object.
-        :param iterable methods: Methods (strings) to register.
-        :param dict names: Dictionary of ``name`` overrides.
+        :param methods: Methods (strings) to register.
+        :param names: Dictionary of ``name`` overrides.
         """
         names = names or {}
         if methods:
@@ -82,7 +82,9 @@ def make_path(path, url_prefix=None):
             else path)
 
 @contextmanager
-def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
+def add_route_context(
+    app: web.Application, module=None, url_prefix: str=None, name_prefix: str=None
+):
     """Context manager which yields a function for adding multiple routes from a given module.
 
     Example:
@@ -115,6 +117,11 @@ def add_route_context(app, module=None, url_prefix=None, name_prefix=None):
                                url_prefix='/api/', name_prefix='articles') as route:
             route('GET', '/articles/', 'list_articles')
             route('POST', '/articles/', 'create_article')
+
+    :param app: Application to add routes to.
+    :param module: Import path to module (str) or module object which contains the handlers.
+    :param url_prefix: Prefix to prepend to all route paths.
+    :param name_prefix: Prefix to prepend to all route names.
     """
     if isinstance(module, (str, bytes)):
         module = importlib.import_module(module)
@@ -151,7 +158,8 @@ def get_supported_method_names(resource):
 
 @contextmanager
 def add_resource_context(
-    app, module=None, url_prefix=None, name_prefix=None, make_resource=lambda cls: cls()
+    app: web.Application, module=None,
+    url_prefix: str=None, name_prefix: str=None, make_resource=lambda cls: cls()
 ):
     """Context manager which yields a function for adding multiple resources from a given module
     to an app using `ResourceRouter <aiohttp_utils.routing.ResourceRouter>`.
@@ -211,6 +219,14 @@ def add_resource_context(
                                     url_prefix='/api/',
                                     make_resource=lambda cls: cls(db=db)) as route:
                 route('/authors/', 'AuthorList')
+
+    :param app: Application to add routes to.
+    :param resource: Import path to module (str) or module object
+        which contains the resource classes.
+    :param url_prefix: Prefix to prepend to all route paths.
+    :param name_prefix: Prefix to prepend to all route names.
+    :param make_resource: Function which receives a resource class and returns
+        a resource instance.
     """
     assert isinstance(app.router, ResourceRouter), 'app must be using ResourceRouter'
 

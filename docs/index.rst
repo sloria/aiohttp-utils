@@ -48,14 +48,16 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
             port=8000
         )
 
-.. Install
-.. =======
-.. ::
+Install
+=======
+::
 
-..     $ pip install aiohttp_utils
+    $ pip install aiohttp_utils
 
 Utilities
 ---------
+
+Below is a listing of available utility modules.
 
 .. toctree::
     :maxdepth: 1

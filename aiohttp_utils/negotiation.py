@@ -1,4 +1,5 @@
-"""Content negotiation API.
+"""Content negotiation is the process of selecting an appropriate
+representation (e.g. JSON, HTML, etc.) to return to a client.
 
 .. code-block:: python
 
@@ -161,7 +162,8 @@ class JSONRenderer:
     def __call__(self, request, data):
         return self.json_module.dumps(data).encode('utf-8')
 
-#: Render data to JSON.
+#: Render data to JSON. Singleton `JSONRenderer`. This can be passed to the
+#: ``RENDERERS``` configuration option, e.g. ``('application/json', render_json)``.
 render_json = JSONRenderer()
 
 ##### Main API #####
@@ -218,18 +220,19 @@ def negotiation_middleware(
 
 
 def setup(
-    app: web.Application, *, negotiator=DEFAULTS['NEGOTIATOR'],
-    renderers=DEFAULTS['RENDERERS'], force_negotiation=DEFAULTS['FORCE_NEGOTIATION']
+    app: web.Application, *, negotiator: callable=DEFAULTS['NEGOTIATOR'],
+    renderers: OrderedDict=DEFAULTS['RENDERERS'],
+    force_negotiation: bool=DEFAULTS['FORCE_NEGOTIATION']
 ):
     """Set up the negotiation middleware. Saves configuration to
     app['aiohttp_utils'].
 
-    :param aiohttp.web.Application: Application to set up.
-    :param callable negotiator: Function that selects a renderer, given a
+    :param app: Application to set up.
+    :param negotiator: Function that selects a renderer, given a
         request, a dict of renderers, and a ``force`` parameter (whether to return
         a renderer even if the client passes an unsupported media type).
-    :param OrderedDict renderers: Mapping of mediatypes to callable renderers.
-    :param bool force_negotiation: Whether to return a rennderer even if the
+    :param renderers: Mapping of mediatypes to callable renderers.
+    :param force_negotiation: Whether to return a rennderer even if the
         client passes an unsupported media type).
     """
     config = app.get(APP_KEY, {})

@@ -1,4 +1,5 @@
 -r ../dev-requirements.txt
 sphinx
 sphinx-rtd-theme
+sphinx-autodoc-annotation
 sphinx-issues>=0.2.0
