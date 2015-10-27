@@ -139,7 +139,8 @@ class Response(web.Response):
 def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
     """
     Given a request and a list of renderers, return a two-tuple of:
-    (media type, render callable).
+    (media type, render callable). Uses mimeparse to find the best media
+    type match from the ACCEPT header.
     """
     header = request.headers.get('ACCEPT', '*/*')
     best_match = mimeparse.best_match(renderers.keys(), header)
