@@ -23,13 +23,11 @@ from .constants import APP_KEY
 
 __all__ = (
     'setup',
-    'DEFAULTS',
     'NormalizePathMiddleware',
     'normalize_path_middleware',
 )
 
 DEFAULTS = {
-    # Whether to append trailing slashes to URLs.
     'APPEND_SLASH': True,
     'MERGE_SLASHES': True,
 }
@@ -113,23 +111,25 @@ class NormalizePathMiddleware:
 
 normalize_path_middleware = NormalizePathMiddleware
 
-def setup(app: web.Application, overrides: dict=None):
+def setup(
+    app: web.Application, *,
+    append_slash: bool=DEFAULTS['APPEND_SLASH'],
+    merge_slashes: bool=DEFAULTS['MERGE_SLASHES']
+):
     """Set up the path normalization middleware. Saves configuration to
     app['aiohttp_utils'].
 
     :param aiohttp.web.Application: Application to set up.
-    :param dict overrides: Configuration overrides.
+    :param bool append_slash: Whether to append trailing slashes to URLs.
+    :param bool merge_slashes: Whether to merge multiple slashes in URLs to a single
+        slash
     """
-    overrides = overrides or {}
     config = app.get(APP_KEY, {})
-    for key, val in DEFAULTS.items():
-        config.setdefault(key, val)
-    config.update(overrides)
     app[APP_KEY] = config
 
     middleware = normalize_path_middleware(
-        append_slash=config['APPEND_SLASH'],
-        merge_slashes=config['MERGE_SLASHES'],
+        append_slash=config.get('APPEND_SLASH', append_slash),
+        merge_slashes=config.get('MERGE_SLASHES', merge_slashes),
     )
     app.middlewares.append(middleware)
     return app

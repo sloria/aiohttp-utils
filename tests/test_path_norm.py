@@ -29,15 +29,14 @@ def add_routes(app):
     app.router.add_route("GET", '/root/resource/', handler1)
     app.router.add_route("GET", "/root/resource/{tail:.*}", handler2)
 
-def configure_app(app, overrides=None, setup=True):
+def configure_app(app, overrides=None, setup=False):
     overrides = overrides or {}
     add_routes(app)
+
     if setup:
-        overrides = {key.upper(): value for key, value in overrides.items()}
-        path_norm.setup(app, overrides)
+        path_norm.setup(app, **overrides)
     else:
-        kwargs = {key.lower(): value for key, value in overrides.items()}
-        middleware = normalize_path_middleware(**kwargs)
+        middleware = path_norm.normalize_path_middleware(**overrides)
         app.middlewares.append(middleware)
 
 
@@ -65,10 +64,11 @@ class TestNormalizePathMiddleware:
         res = res.follow()
         assert res.request.path_qs == '/articles/'
 
-    def test_append_slash_false_not_found(self, app, client):
+    @pytest.mark.parametrize('setup', [True, False])
+    def test_append_slash_false_not_found(self, app, client, setup):
         configure_app(app, {
             'append_slash': False
-        })
+        }, setup=setup)
         res = client.get('/articles', expect_errors=True)
         assert res.status_code == 404
 
