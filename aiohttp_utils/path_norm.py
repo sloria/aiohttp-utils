@@ -7,10 +7,11 @@
 
     from aiohttp_utils import path_norm
 
-    path_norm.setup(app, {
-        'APPEND_SLASH': True,
-        'MERGE_SLASHES': True
-    })
+    path_norm.setup(
+        app,
+        append_slash=True,
+        merge_slashes=True
+    )
 """
 import asyncio
 

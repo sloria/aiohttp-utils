@@ -47,8 +47,8 @@ We can consume the app with httpie.
 Customizing negotiation
 =======================
 
-Renderers are just callables that receive a `request <aiohttp.web.Request>`,
-data to render, and the current ``handler`` function
+Renderers are just callables that receive a `request <aiohttp.web.Request>` and the
+data to render.
 
 Renderers can return either the rendered representation of the data
 or a `Response <aiohttp.web.Response>`.
@@ -58,7 +58,7 @@ Example:
 .. code-block:: python
 
     # A simple text renderer
-    def render_text(request, data, handler):
+    def render_text(request, data):
         return data.encode(request.charset)
 
     # OR, if you need to parametrize your renderer, you can use a class
@@ -67,7 +67,7 @@ Example:
         def __init__(self, charset):
             self.charset = charset
 
-        def __call__(self, request, data, handler):
+        def __call__(self, request, data):
             return data.encode(self.charset)
 
     render_text_utf8 = TextRenderer('utf-8')
@@ -128,9 +128,9 @@ class Response(web.Response):
 
 ##### Negotiation strategies #####
 
-def select_renderer(request: web.Request, renderers: OrderedDict, handler, force=True):
+def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
     """
-    Given a request, a list of renderers, the current handler, and the ``force`` configuration
+    Given a request, a list of renderers, and the ``force`` configuration
     option, return a two-tuple of:
     (media type, render callable). Uses mimeparse to find the best media
     type match from the ACCEPT header.
@@ -154,7 +154,7 @@ class JSONRenderer:
     def __repr__(self):
         return '<JSONRenderer()>'
 
-    def __call__(self, request, data, handler):
+    def __call__(self, request, data):
         return self.json_module.dumps(data).encode('utf-8')
 
 #: Render data to JSON. Singleton `JSONRenderer`. This can be passed to the
@@ -189,7 +189,6 @@ def negotiation_middleware(
             content_type, renderer = negotiator(
                 request,
                 renderers,
-                handler,
                 force_negotiation,
             )
             request['selected_media_type'] = content_type
@@ -198,9 +197,9 @@ def negotiation_middleware(
             if getattr(response, 'data', None):
                 # Render data with the selected renderer
                 if asyncio.iscoroutinefunction(renderer):
-                    render_result = yield from renderer(request, response.data, handler)
+                    render_result = yield from renderer(request, response.data)
                 else:
-                    render_result = renderer(request, response.data, handler)
+                    render_result = renderer(request, response.data)
             else:
                 render_result = response
 

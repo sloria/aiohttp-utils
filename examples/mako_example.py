@@ -44,7 +44,7 @@ def index(request):
 
 ##### Custom router #####
 
-class RoutingWithTemplating(web.UrlDispatcher):
+class RouterWithTemplating(web.UrlDispatcher):
     """Optionally save a template name on a handler function's __dict__."""
 
     def add_route(self, method, path, handler, template: str=None, **kwargs):
@@ -54,7 +54,8 @@ class RoutingWithTemplating(web.UrlDispatcher):
 
 ##### Renderer #####
 
-def render_mako(request, data, handler):
+def render_mako(request, data):
+    handler = request.match_info.handler
     template_name = handler.__dict__.get('template', None)
     if not template_name:
         raise web.HTTPNotAcceptable(text='text/html not supported.')
@@ -78,7 +79,7 @@ CONFIG = {
 
 ##### Application #####
 
-app = web.Application(router=RoutingWithTemplating(), debug=True)
+app = web.Application(router=RouterWithTemplating(), debug=True)
 app['mako_lookup'] = lookup
 app.update(CONFIG)
 negotiation.setup(app)

@@ -40,11 +40,11 @@ aiohttp_utils
     app.router.add_resource('/', HelloResource())
 
     # Content negotiation
-    negotiation.setup(app, {
-        'RENDERERS': {
+    negotiation.setup(
+        app, renderers={
             'application/json': negotiation.render_json
         }
-    })
+    )
 
     if __name__ == '__main__':
         # Development server

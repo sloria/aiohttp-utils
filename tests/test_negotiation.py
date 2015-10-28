@@ -63,7 +63,7 @@ def test_renders_to_json_by_default(app, client, setup):
     assert res.json == {'message': 'Post coro'}
 
 
-def dummy_renderer(request, data, handler):
+def dummy_renderer(request, data):
     return web.Response(
         body='<p>{}</p>'.format(data['message']).encode('utf-8'),
         content_type='text/html'
