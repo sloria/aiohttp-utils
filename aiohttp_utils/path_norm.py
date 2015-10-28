@@ -126,8 +126,6 @@ def setup(
         slash
     """
     config = app.get(APP_KEY, {})
-    app[APP_KEY] = config
-
     middleware = normalize_path_middleware(
         append_slash=config.get('APPEND_SLASH', append_slash),
         merge_slashes=config.get('MERGE_SLASHES', merge_slashes),
