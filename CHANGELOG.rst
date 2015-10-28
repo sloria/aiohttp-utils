@@ -2,7 +2,7 @@
 Changelog
 *********
 
-1.0.0 (unreleased)
+1.0.0 (2015-10-27)
 ==================
 
 - [negotiation,path_norm] *Backwards-incompatible*: Changed signatures of ``negotiation.setup`` and ``path_norm.setup`` to be more explicit. Both now take keyword-only arguments which are the same as the module's configuration keys, except lowercased, e.g. ``setup(app, append_slash=True, merge_slashes=True)``.
