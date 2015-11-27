@@ -1,7 +1,7 @@
 from aiohttp import web
 import pytest
 
-from aiohttp_utils import path_norm, APP_KEY
+from aiohttp_utils import path_norm, CONFIG_KEY
 from aiohttp_utils.path_norm import normalize_path_middleware
 
 from .conftest import make_dummy_handler
@@ -122,7 +122,7 @@ class TestNormalizePathMiddleware:
 
     def test_configuration_through_app_key(self, app, client):
         add_routes(app)
-        app[APP_KEY] = {
+        app[CONFIG_KEY] = {
             'APPEND_SLASH': False
         }
 

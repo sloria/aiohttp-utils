@@ -20,7 +20,7 @@ from aiohttp.web_urldispatcher import (
     SystemRoute, UrlMappingMatchInfo, _MethodNotAllowedMatchInfo, _NotFoundMatchInfo
 )
 
-from .constants import APP_KEY
+from .constants import CONFIG_KEY
 
 __all__ = (
     'setup',
@@ -125,7 +125,7 @@ def setup(
     :param merge_slashes: Whether to merge multiple slashes in URLs to a single
         slash
     """
-    config = app.get(APP_KEY, {})
+    config = app.get(CONFIG_KEY, {})
     middleware = normalize_path_middleware(
         append_slash=config.get('APPEND_SLASH', append_slash),
         merge_slashes=config.get('MERGE_SLASHES', merge_slashes),

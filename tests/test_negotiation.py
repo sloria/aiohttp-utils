@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from aiohttp import web
 
-from aiohttp_utils import negotiation, APP_KEY
+from aiohttp_utils import negotiation, CONFIG_KEY
 from aiohttp_utils.negotiation import Response
 
 
@@ -121,7 +121,7 @@ def test_nonordered_dict_of_renderers(app, client):
 
 def test_configuration_through_app_key(app, client):
     add_routes(app)
-    app[APP_KEY] = {
+    app[CONFIG_KEY] = {
         'RENDERERS': OrderedDict([
             ('text/html', dummy_renderer),
         ])

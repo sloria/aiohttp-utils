@@ -99,7 +99,7 @@ import json as pyjson
 from aiohttp import web
 import mimeparse
 
-from .constants import APP_KEY
+from .constants import CONFIG_KEY
 
 
 __all__ = (
@@ -231,7 +231,7 @@ def setup(
     :param force_negotiation: Whether to return a rennderer even if the
         client passes an unsupported media type).
     """
-    config = app.get(APP_KEY, {})
+    config = app.get(CONFIG_KEY, {})
     middleware = negotiation_middleware(
         renderers=config.get('RENDERERS', renderers),
         negotiator=config.get('NEGOTIATOR', negotiator),
