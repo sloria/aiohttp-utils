@@ -2,11 +2,11 @@
 Changelog
 *********
 
-2.0.0 (unreleased)
+2.0.0 (2016-03-13)
 ==================
 
 - Fix compatibility with aiohttp>=0.21.0.
-- [routing] *Backwards-incompatible*: Renamed ``ResourceRouter.add_resource`` to ``ResourceRouter.add_resource_object``, to prevent clashing with aiohttp's URLDispatcher.
+- [routing] *Backwards-incompatible*: Renamed ``ResourceRouter.add_resource`` to ``ResourceRouter.add_resource_object`` to prevent clashing with aiohttp's URLDispatcher.
 
 1.0.0 (2015-10-27)
 ==================
