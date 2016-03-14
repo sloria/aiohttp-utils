@@ -15,10 +15,12 @@
 """
 import asyncio
 
-from aiohttp import web, hdrs
+from aiohttp import web
 from aiohttp.web_urldispatcher import (
-    SystemRoute, UrlMappingMatchInfo, _MethodNotAllowedMatchInfo, _NotFoundMatchInfo
+    SystemRoute,
+    MatchInfoError,
 )
+from aiohttp.web_exceptions import HTTPMethodNotAllowed, HTTPNotFound
 
 from .constants import CONFIG_KEY
 
@@ -37,21 +39,18 @@ DEFAULTS = {
 def resolve2(router, method, path):
     allowed_methods = set()
 
-    for route in router._urls:
-        match_dict = route.match(path)
-        if match_dict is None:
-            continue
-
-        route_method = route.method
-        if route_method == method or route_method == hdrs.METH_ANY:
-            return UrlMappingMatchInfo(match_dict, route)
-
-        allowed_methods.add(route_method)
+    for resource in router._resources:
+        match_dict, allowed = yield from resource.resolve(method, path)
+        if match_dict is not None:
+            return match_dict
+        else:
+            allowed_methods |= allowed
     else:
         if allowed_methods:
-            return _MethodNotAllowedMatchInfo(method, allowed_methods)
+            return MatchInfoError(HTTPMethodNotAllowed(method,
+                                                        allowed_methods))
         else:
-            return _NotFoundMatchInfo()
+            return MatchInfoError(HTTPNotFound())
 
 class NormalizePathMiddleware:
     """Middleware for path normalization.

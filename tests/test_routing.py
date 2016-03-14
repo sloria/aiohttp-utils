@@ -37,9 +37,9 @@ def configure_app(app):
     class ChildResource(MyResource):
         pass
 
-    app.router.add_resource('/my', MyResource())
-    app.router.add_resource('/my2', MyResource2(), names={'get': 'my_resource2_get'})
-    app.router.add_resource('/child', ChildResource(), methods=('get', ))
+    app.router.add_resource_object('/my', MyResource())
+    app.router.add_resource_object('/my2', MyResource2(), names={'get': 'my_resource2_get'})
+    app.router.add_resource_object('/child', ChildResource(), methods=('get', ))
 
 
 class TestResourceRouter:

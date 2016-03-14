@@ -34,7 +34,7 @@ class ResourceRouter(web.UrlDispatcher):
                 return web.Response(body=b'Posted it', content_type='text/plain')
 
 
-        app.router.add_resource('/', IndexResource())
+        app.router.add_resource_object('/', IndexResource())
 
         # Normal function-based handlers still work
         async def handler(request):
@@ -48,7 +48,7 @@ class ResourceRouter(web.UrlDispatcher):
 
     You can override the default names by passing a ``names`` dict to `add_resource`. ::
 
-        app.router.add_resource('/', IndexResource(), names={'get': 'index_get'})
+        app.router.add_resource_object('/', IndexResource(), names={'get': 'index_get'})
         app.router['index_get'].url() == '/'
     """
 
@@ -57,7 +57,7 @@ class ResourceRouter(web.UrlDispatcher):
     def get_default_handler_name(self, resource, method_name: str):
         return '{resource.__class__.__name__}:{method_name}'.format(**locals())
 
-    def add_resource(self, path: str, resource, methods: tuple=tuple(), names: Mapping=None):
+    def add_resource_object(self, path: str, resource, methods: tuple=tuple(), names: Mapping=None):
         """Add routes by an resource instance's methods.
 
         :param path: route path. Should be started with slash (``'/'``).
@@ -260,5 +260,5 @@ def add_resource_context(
                 )
                 for method_name in supported_method_names
             }
-        return app.router.add_resource(path, resource, names=names)
+        return app.router.add_resource_object(path, resource, names=names)
     yield add_route

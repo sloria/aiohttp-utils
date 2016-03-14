@@ -30,7 +30,7 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
             })
 
 
-    app.router.add_resource('/', HelloResource())
+    app.router.add_resource_object('/', HelloResource())
 
     # Content negotiation
     negotiation.setup(

@@ -37,7 +37,7 @@ aiohttp_utils
             })
 
 
-    app.router.add_resource('/', HelloResource())
+    app.router.add_resource_object('/', HelloResource())
 
     # Content negotiation
     negotiation.setup(
