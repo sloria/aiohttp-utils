@@ -1,5 +1,5 @@
-"""Example of using content negotiation to support HTML representations, using
-Mako for templating. Also demonstrates app configuration.
+"""Example of using content negotiation to simultaneously support HTML and JSON representations,
+using Mako for templating. Also demonstrates app configuration.
 
 Start the app with
 ::
@@ -24,7 +24,7 @@ from mako.lookup import TemplateLookup
 ##### Templates #####
 
 lookup = TemplateLookup()
-# Note: In a real app, this would be in a file.
+# Note: In a real app, this would be in a separate file.
 template = """
 <html>
     <body>

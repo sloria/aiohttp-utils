@@ -6,7 +6,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath('..'))
-import aiohttp_utils
+import aiohttp_utils  # flake8: noqa
 
 extensions = [
     'sphinx.ext.autodoc',

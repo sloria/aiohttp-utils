@@ -25,9 +25,9 @@ __all__ = (
 
 class GunicornWorker(BaseWorker):
     # Override to set the app's loop to the worker's loop
-    def make_handler(self, app, host, port):
+    def make_handler(self, app, **kwargs):
         app._loop = self.loop
-        return super().make_handler(app, host, port)
+        return super().make_handler(app, **kwargs)
 
 class GunicornApp(BaseApplication):
 
