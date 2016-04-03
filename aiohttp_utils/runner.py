@@ -9,6 +9,10 @@ reload when code changes.
     app = web.Application()
     # ...
     run(app, app_uri='path.to.module:app', reload=True, port=5000)
+
+
+.. warning::
+    Auto-reloading functionality is currently **experimental**.
 """
 from aiohttp import web
 from aiohttp.worker import GunicornWebWorker as BaseWorker
@@ -100,6 +104,7 @@ def run(app: web.Application, **kwargs):
     :param int port: Port of the server.
     :param bool reload: Whether to reload the server on a code change.
         If not set, will take the same value as ``app.debug``.
+        **EXPERIMENTAL**.
     :param \*\*kwargs: Extra configuration options to set on the
         ``GunicornApp's`` config object.
     """
