@@ -2,7 +2,7 @@
 Changelog
 *********
 
-2.0.1 (unreleased)
+2.0.1 (2016-04-03)
 ==================
 
 - [runner] Fix compatibility with aiohttp>=0.21.0 (:issue:`2`). Thanks :user:`charlesfleche` for reporting.
