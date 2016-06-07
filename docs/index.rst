@@ -3,7 +3,7 @@ aiohttp_utils
 
 Release v\ |version|. (:ref:`Changelog <changelog>`)
 
-**aiohttp_utils** provides handy utilities for building `aiohttp.web <http://aiohttp.readthedocs.org/>`_ applications.
+**aiohttp_utils** provides handy utilities for building `aiohttp.web <https://aiohttp.readthedocs.io/>`_ applications.
 
 
 * Method-based handlers ("resources")

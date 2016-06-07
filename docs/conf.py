@@ -20,8 +20,8 @@ primary_domain = 'py'
 default_role = 'py:obj'
 
 intersphinx_mapping = {
-    'python': ('http://python.readthedocs.org/en/latest/', None),
-    'aiohttp': ('http://aiohttp.readthedocs.org/en/stable/', None),
+    'python': ('https://python.readthedocs.io/en/latest/', None),
+    'aiohttp': ('https://aiohttp.readthedocs.io/en/stable/', None),
 }
 
 issues_github_path = 'sloria/aiohttp_utils'

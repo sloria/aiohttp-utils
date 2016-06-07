@@ -10,7 +10,7 @@ aiohttp_utils
     :target: https://travis-ci.org/sloria/aiohttp_utils
     :alt: Travis-CI
 
-**aiohttp_utils** provides handy utilities for building `aiohttp.web <http://aiohttp.readthedocs.org/>`_ applications.
+**aiohttp_utils** provides handy utilities for building `aiohttp.web <https://aiohttp.readthedocs.io/>`_ applications.
 
 
 * Method-based handlers ("resources")
@@ -64,13 +64,13 @@ Install
 Documentation
 =============
 
-Full documentation is available at https://aiohttp-utils.readthedocs.org/.
+Full documentation is available at https://aiohttp-utils.readthedocs.io/.
 
 Project Links
 =============
 
-- Docs: http://aiohttp-utils.readthedocs.org/
-- Changelog: http://aiohttp-utils.readthedocs.org/en/latest/changelog.html
+- Docs: https://aiohttp-utils.readthedocs.io/
+- Changelog: https://aiohttp-utils.readthedocs.io/en/latest/changelog.html
 - PyPI: https://pypi.python.org/pypi/aiohttp_utils
 - Issues: https://github.com/sloria/aiohttp_utils/issues
 
