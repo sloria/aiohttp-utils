@@ -2,9 +2,10 @@
 Changelog
 *********
 
-3.0.0 (unreleased)
+3.0.0 (2016-03-16)
 ==================
 
+- Test against Python 3.6.
 - [runner] *Backwards-incompatible*: The `runner` module is deprecated. Install `aiohttp-devtools` and use the `adev runserver` command instead.
 - [path_norm] *Backwards-incompatible*: The `path_norm` module is removed, as it is now available in `aiohttp` in `aiohttp.web_middlewares.normalize_path_middleware`.
 
