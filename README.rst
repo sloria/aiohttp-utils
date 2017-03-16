@@ -22,7 +22,7 @@ aiohttp_utils
 .. code-block:: python
 
     from aiohttp import web
-    from aiohttp_utils import Response, routing, negotiation, run
+    from aiohttp_utils import Response, routing, negotiation
 
     app = web.Application(router=routing.ResourceRouter())
 
