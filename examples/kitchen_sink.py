@@ -6,9 +6,10 @@
 - path normalization, and
 - local development server with reloading.
 
-Start the app with
+Start the app with the `adev runserver` command from aiohttp-devtools
 ::
-    $ python examples/resources_with_negotiation.py
+    $ pip install aiohttp-devtools
+    $ adev runserver examples/kitchen_sink.py
 
 Try it out:
 ::
@@ -20,7 +21,7 @@ Try it out:
 from asyncio import coroutine
 
 from aiohttp import web
-from aiohttp_utils import Response, routing, negotiation, run, path_norm
+from aiohttp_utils import Response, routing, negotiation
 
 app = web.Application(router=routing.ResourceRouter())
 
@@ -44,12 +45,3 @@ with routing.add_resource_context(app, url_prefix='/api/') as route:
     route('/', HelloResource())
 
 negotiation.setup(app)
-path_norm.setup(app)
-
-if __name__ == "__main__":
-    run(
-        app,
-        app_uri="examples.kitchen_sink:app",
-        reload=True,
-        port=8000
-    )

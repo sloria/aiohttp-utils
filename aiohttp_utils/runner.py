@@ -14,6 +14,8 @@ reload when code changes.
 .. warning::
     Auto-reloading functionality is currently **experimental**.
 """
+import warnings
+
 from aiohttp import web
 from aiohttp.worker import GunicornWebWorker as BaseWorker
 from gunicorn.app.wsgiapp import WSGIApplication as BaseApplication
@@ -63,6 +65,9 @@ class Runner:
         reload: bool=None,
         **options
     ):
+        warnings.warn('aiohttp_utils.runner is deprecated. '
+                      'Install aiohttp-devtools and use '
+                      'the "adev runserver" command instead.', DeprecationWarning)
         self.app = app
         self.app_uri = app_uri
         self.host = host

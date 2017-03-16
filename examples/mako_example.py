@@ -1,10 +1,10 @@
 """Example of using content negotiation to simultaneously support HTML and JSON representations,
 using Mako for templating. Also demonstrates app configuration.
 
-Start the app with
+Start the app with the `adev runserver` command from aiohttp-devtools
 ::
-    $ pip install mako
-    $ python examples/mako_example.py
+    $ pip install aiohttp-devtools
+    $ adev runserver examples/mako_example.py
 
 Try it out:
 ::
@@ -17,7 +17,7 @@ from collections import OrderedDict, Mapping
 from asyncio import coroutine
 
 from aiohttp import web
-from aiohttp_utils import Response, negotiation, run
+from aiohttp_utils import Response, negotiation
 
 from mako.lookup import TemplateLookup
 
@@ -84,11 +84,3 @@ app['mako_lookup'] = lookup
 app.update(CONFIG)
 negotiation.setup(app)
 app.router.add_route('GET', '/', index, template='index.html')
-
-if __name__ == "__main__":
-    run(
-        app,
-        app_uri='examples.mako_example:app',
-        reload=True,
-        port=8000,
-    )

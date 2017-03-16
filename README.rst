@@ -14,9 +14,8 @@ aiohttp_utils
 
 
 * Method-based handlers ("resources")
+* Routing utilities
 * Content negotiation with JSON rendering by default
-* Local development server with auto-reloading
-* And more
 
 **Everything is optional**. You can use as much (or as little) of this toolkit as you need.
 
@@ -45,15 +44,6 @@ aiohttp_utils
             'application/json': negotiation.render_json
         }
     )
-
-    if __name__ == '__main__':
-        # Development server
-        run(
-            app,
-            app_uri='hello.app:app',
-            reload=True,
-            port=8000
-        )
 
 Install
 =======

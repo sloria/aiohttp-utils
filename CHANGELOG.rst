@@ -2,6 +2,12 @@
 Changelog
 *********
 
+3.0.0 (unreleased)
+==================
+
+- [runner] *Backwards-incompatible*: The `runner` module is deprecated. Install `aiohttp-devtools` and use the `adev runserver` command instead.
+- [path_norm] *Backwards-incompatible*: The `path_norm` module is removed, as it is now available in `aiohttp` in `aiohttp.web_middlewares.normalize_path_middleware`.
+
 2.0.1 (2016-04-03)
 ==================
 

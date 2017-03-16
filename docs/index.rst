@@ -7,9 +7,8 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
 
 
 * Method-based handlers ("resources")
+* Routing utilities
 * Content negotiation with JSON rendering by default
-* Local development server with auto-reloading
-* And more
 
 **Everything is optional**. You can use as much (or as little) of this toolkit as you need.
 
@@ -39,15 +38,6 @@ Release v\ |version|. (:ref:`Changelog <changelog>`)
         }
     )
 
-    if __name__ == '__main__':
-        # Development server
-        run(
-            app,
-            app_uri='hello.app:app',
-            reload=True,
-            port=8000
-        )
-
 Install
 -------
 ::
@@ -66,9 +56,7 @@ Below are usage guides for each of the modules.
     :maxdepth: 1
 
     modules/negotiation
-    modules/path_norm
     modules/routing
-    modules/runner
 
 Project info
 ------------
