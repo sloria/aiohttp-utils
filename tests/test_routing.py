@@ -20,11 +20,11 @@ def configure_app(app):
     class MyResource:
 
         def get(self, request):
-            return web.Response(body=b'Got it', content_type='text/plain; charset=utf-8')
+            return web.Response(body=b'Got it', content_type='text/plain')
 
         @asyncio.coroutine
         def post(self, request):
-            return web.Response(body=b'Posted it', content_type='text/plain; charset=utf-8')
+            return web.Response(body=b'Posted it', content_type='text/plain')
 
     class MyResource2:
 

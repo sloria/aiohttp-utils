@@ -21,20 +21,6 @@ class TestKitchenSinkApp:
         assert res.status_code == 200
         assert res.json == {'message': 'Welcome to the API!'}
 
-    def test_api_index_append_slash(self, client):
-        res = client.get('/api')
-        assert res.status_code == 301
-        res = res.follow()
-        assert res.status_code == 200
-        assert res.request.path == '/api/'
-
-    def test_api_index_merge_slashes(self, client):
-        res = client.get('/api//')
-        assert res.status_code == 301
-        res = res.follow()
-        assert res.status_code == 200
-        assert res.request.path == '/api/'
-
 class TestMakoApp:
 
     @pytest.fixture()
