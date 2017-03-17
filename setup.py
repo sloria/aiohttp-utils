@@ -44,7 +44,7 @@ setup(
     package_dir={'aiohttp_utils': 'aiohttp_utils'},
     include_package_data=True,
     install_requires=REQUIRES,
-    license=read('LICENSE'),
+    license='MIT',
     zip_safe=False,
     keywords='aiohttp_utils aiohttp utilities aiohttp.web',
     classifiers=[
