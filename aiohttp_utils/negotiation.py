@@ -91,6 +91,21 @@ with a corresponding media type.
     We use an `OrderedDict <collections.OrderedDict>` of renderers because priority is given to
     the first specified renderer when the client passes an unsupported media type.
 
+By default, rendering the value returned by a handler according to content
+negotiation will only occur if this value is considered True. If you want to
+enforce the rendering whatever the boolean interpretation of the returned
+value you can set the `force_rendering` flag:
+
+.. code-block:: python
+
+    from collections import OrderedDict
+    from aiohttp_utils import negotiation
+
+    negotiation.setup(app, force_rendering=True,
+                      renderers=OrderedDict([
+        ('application/json', negotiation.render_json),
+    ]))
+
 """
 from collections import OrderedDict
 import asyncio
@@ -174,13 +189,15 @@ DEFAULTS = {
         ('application/json', render_json),
     ]),
     'FORCE_NEGOTIATION': True,
+    'FORCE_RENDERING': False,
 }
 
 
 def negotiation_middleware(
     renderers=DEFAULTS['RENDERERS'],
     negotiator=DEFAULTS['NEGOTIATOR'],
-    force_negotiation=DEFAULTS['FORCE_NEGOTIATION']
+    force_negotiation=DEFAULTS['FORCE_NEGOTIATION'],
+    force_rendering=DEFAULTS['FORCE_RENDERING']
 ):
     """Middleware which selects a renderer for a given request then renders
     a handler's data to a `aiohttp.web.Response`.
@@ -198,7 +215,7 @@ def negotiation_middleware(
             request['selected_media_type'] = content_type
             response = yield from handler(request)
 
-            if getattr(response, 'data', None):
+            if force_rendering or getattr(response, 'data', None):
                 # Render data with the selected renderer
                 if asyncio.iscoroutinefunction(renderer):
                     render_result = yield from renderer(request, response.data)
@@ -206,11 +223,10 @@ def negotiation_middleware(
                     render_result = renderer(request, response.data)
             else:
                 render_result = response
-
             if isinstance(render_result, web.Response):
                 return render_result
 
-            if getattr(response, 'data', None):
+            if force_rendering or getattr(response, 'data', None) is not None:
                 response.body = render_result
                 response.content_type = content_type
 
@@ -222,7 +238,8 @@ def negotiation_middleware(
 def setup(
         app: web.Application, *, negotiator: callable = DEFAULTS['NEGOTIATOR'],
         renderers: OrderedDict = DEFAULTS['RENDERERS'],
-        force_negotiation: bool = DEFAULTS['FORCE_NEGOTIATION']):
+        force_negotiation: bool = DEFAULTS['FORCE_NEGOTIATION'],
+        force_rendering: bool = DEFAULTS['FORCE_RENDERING']):
     """Set up the negotiation middleware. Reads configuration from
     ``app['AIOHTTP_UTILS']``.
 
@@ -231,14 +248,17 @@ def setup(
         request, a dict of renderers, and a ``force`` parameter (whether to return
         a renderer even if the client passes an unsupported media type).
     :param renderers: Mapping of mediatypes to callable renderers.
-    :param force_negotiation: Whether to return a rennderer even if the
+    :param force_negotiation: Whether to return a renderer even if the
         client passes an unsupported media type).
+    :param force_rendering: Whether to enforce rendering the result even if it
+        considered False.
     """
     config = app.get(CONFIG_KEY, {})
     middleware = negotiation_middleware(
         renderers=config.get('RENDERERS', renderers),
         negotiator=config.get('NEGOTIATOR', negotiator),
-        force_negotiation=config.get('FORCE_NEGOTIATION', force_negotiation)
+        force_negotiation=config.get('FORCE_NEGOTIATION', force_negotiation),
+        force_rendering=config.get('FORCE_RENDERING', force_rendering)
     )
     app.middlewares.append(middleware)
     return app

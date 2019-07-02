@@ -22,6 +22,12 @@ def add_routes(app):
     def handler(request):
         return Response({'message': 'Hello world'})
 
+    def handler_false(request):
+        return Response(False)
+
+    def handler_none(request):
+        return Response(None)
+
     @asyncio.coroutine
     def coro_handler(request):
         return Response({'message': 'Hello coro'})
@@ -33,6 +39,8 @@ def add_routes(app):
     app.router.add_route('GET', '/hello', handler)
     app.router.add_route('GET', '/hellocoro', coro_handler)
     app.router.add_route('POST', '/postcoro', post_coro_handler)
+    app.router.add_route('GET', '/false', handler_false)
+    app.router.add_route('GET', '/none', handler_none)
 
 
 def configure_app(app, overrides=None, setup=False):
@@ -61,6 +69,15 @@ def test_renders_to_json_by_default(app, client, setup):
     assert res.content_type == 'application/json'
     assert res.status_code == 201
     assert res.json == {'message': 'Post coro'}
+
+    # without force_rendering=True, false values discard any rendering process
+    res = client.get('/false')
+    assert res.content_type == 'application/octet-stream'
+    assert res.body == b''
+
+    res = client.get('/none')
+    assert res.content_type == 'application/octet-stream'
+    assert res.body == b''
 
 
 def dummy_renderer(request, data):
@@ -111,6 +128,21 @@ def test_renderer_override_force(app, client):
 
     res = client.get('/hello', headers={'Accept': 'text/notsupported'}, expect_errors=True)
     assert res.status_code == 406
+
+
+def test_renderer_override_force_rendering(app, client):
+    configure_app(app, overrides={
+        'force_rendering': True,
+    }, setup=True)
+
+    # with force_rendering=True, false values are rendered
+    res = client.get('/false')
+    assert res.content_type == 'application/json'
+    assert res.json is False
+
+    res = client.get('/none')
+    assert res.content_type == 'application/json'
+    assert res.json is None
 
 
 def test_nonordered_dict_of_renderers(app, client):
