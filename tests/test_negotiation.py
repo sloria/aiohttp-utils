@@ -12,9 +12,11 @@ from aiohttp_utils.negotiation import Response
 def app(loop):
     return web.Application(loop=loop)
 
+
 @pytest.fixture()
 def client(create_client, app):
     return create_client(app)
+
 
 def add_routes(app):
     def handler(request):
@@ -32,6 +34,7 @@ def add_routes(app):
     app.router.add_route('GET', '/hellocoro', coro_handler)
     app.router.add_route('POST', '/postcoro', post_coro_handler)
 
+
 def configure_app(app, overrides=None, setup=False):
     overrides = overrides or {}
     add_routes(app)
@@ -42,11 +45,8 @@ def configure_app(app, overrides=None, setup=False):
         middleware = negotiation.negotiation_middleware(**overrides)
         app.middlewares.append(middleware)
 
-@pytest.mark.parametrize('setup',
-[
-    True,
-    False
-])
+
+@pytest.mark.parametrize('setup', [True, False])
 def test_renders_to_json_by_default(app, client, setup):
     configure_app(app, overrides=None, setup=setup)
     res = client.get('/hello')
@@ -69,6 +69,7 @@ def dummy_renderer(request, data):
         content_type='text/html'
     )
 
+
 def test_renderer_override(app, client):
     configure_app(app, overrides={
         'renderers': OrderedDict([
@@ -79,6 +80,7 @@ def test_renderer_override(app, client):
     res = client.get('/hello')
     assert res.content_type == 'text/html'
     assert res.body == b'<p>Hello world</p>'
+
 
 def test_renderer_override_multiple_classes(app, client):
     configure_app(app, overrides={
@@ -101,6 +103,7 @@ def test_renderer_override_multiple_classes(app, client):
     assert res.content_type == 'text/html'
     assert res.body == b'<p>Hello world</p>'
 
+
 def test_renderer_override_force(app, client):
     configure_app(app, overrides={
         'force_negotiation': False,
@@ -108,6 +111,7 @@ def test_renderer_override_force(app, client):
 
     res = client.get('/hello', headers={'Accept': 'text/notsupported'}, expect_errors=True)
     assert res.status_code == 406
+
 
 def test_nonordered_dict_of_renderers(app, client):
     configure_app(app, overrides={
@@ -118,6 +122,7 @@ def test_nonordered_dict_of_renderers(app, client):
 
     res = client.get('/hello', headers={'Accept': 'text/notsupported'})
     assert res.content_type == 'application/json'
+
 
 def test_configuration_through_app_key(app, client):
     add_routes(app)

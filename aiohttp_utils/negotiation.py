@@ -111,6 +111,7 @@ __all__ = (
     'render_json'
 )
 
+
 class Response(web.Response):
     """Same as `aiohttp.web.Response`, except that the constructor takes a `data` argument,
     which is the data to be negotiated by the
@@ -126,7 +127,7 @@ class Response(web.Response):
         super().__init__(*args, **kwargs)
 
 
-##### Negotiation strategies #####
+# ##### Negotiation strategies #####
 
 def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
     """
@@ -144,7 +145,8 @@ def select_renderer(request: web.Request, renderers: OrderedDict, force=True):
             raise web.HTTPNotAcceptable
     return best_match, renderers[best_match]
 
-###### Renderers ######
+
+# ###### Renderers ######
 
 # Use a class so that json module is easily override-able
 class JSONRenderer:
@@ -157,11 +159,13 @@ class JSONRenderer:
     def __call__(self, request, data):
         return self.json_module.dumps(data).encode('utf-8')
 
+
 #: Render data to JSON. Singleton `JSONRenderer`. This can be passed to the
 #: ``RENDERERS`` configuration option, e.g. ``('application/json', render_json)``.
 render_json = JSONRenderer()
 
-##### Main API #####
+
+# ##### Main API #####
 
 #: Default configuration
 DEFAULTS = {
@@ -216,10 +220,9 @@ def negotiation_middleware(
 
 
 def setup(
-    app: web.Application, *, negotiator: callable=DEFAULTS['NEGOTIATOR'],
-    renderers: OrderedDict=DEFAULTS['RENDERERS'],
-    force_negotiation: bool=DEFAULTS['FORCE_NEGOTIATION']
-):
+        app: web.Application, *, negotiator: callable = DEFAULTS['NEGOTIATOR'],
+        renderers: OrderedDict = DEFAULTS['RENDERERS'],
+        force_negotiation: bool = DEFAULTS['FORCE_NEGOTIATION']):
     """Set up the negotiation middleware. Reads configuration from
     ``app['AIOHTTP_UTILS']``.
 

@@ -4,6 +4,7 @@ import pytest
 from examples.kitchen_sink import app as kitchen_sink_app
 from examples.mako_example import app as mako_app
 
+
 class TestKitchenSinkApp:
 
     @pytest.fixture()
@@ -20,6 +21,7 @@ class TestKitchenSinkApp:
         res = client.get('/api/')
         assert res.status_code == 200
         assert res.json == {'message': 'Welcome to the API!'}
+
 
 class TestMakoApp:
 

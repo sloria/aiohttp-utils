@@ -7,13 +7,16 @@ from aiohttp import web
 from aiohttp_utils.routing import ResourceRouter, add_route_context, add_resource_context
 from tests import views
 
+
 @pytest.fixture()
 def app(loop):
     return web.Application(loop=loop, router=ResourceRouter())
 
+
 @pytest.fixture()
 def client(create_client, app):
     return create_client(app)
+
 
 def configure_app(app):
 
@@ -135,6 +138,7 @@ class TestAddRouteContext:
         assert str(app.router['api.index'].url_for()) == '/'
         assert str(app.router['api.list_projects'].url_for()) == '/projects/'
 
+
 class TestAddResourceContext:
 
     def test_add_resource_context_basic(self, app):
@@ -144,7 +148,8 @@ class TestAddResourceContext:
 
         assert str(app.router['ArticleResource:get'].url_for()) == '/articles/'
         assert str(app.router['ArticleResource:post'].url_for()) == '/articles/'
-        assert str(app.router['ArticleList:post'].url_for(parts={'pk': 42})) == '/articles/42'
+        assert str(app.router['ArticleList:post'].url_for(
+            pk='42')) == '/articles/42'
 
     def test_add_resource_context_passing_classes(self, app):
         with add_resource_context(app) as route:
@@ -161,7 +166,8 @@ class TestAddResourceContext:
 
         assert str(app.router['ArticleResource:get'].url_for()) == '/articles/'
         assert str(app.router['ArticleResource:post'].url_for()) == '/articles/'
-        assert str(app.router['ArticleList:post'].url_for(parts={'pk': 42})) == '/articles/42'
+        assert str(app.router['ArticleList:post'].url_for(
+            pk='42')) == '/articles/42'
 
     def test_make_resource_override(self, app):
         db = {}
@@ -181,7 +187,8 @@ class TestAddResourceContext:
 
         assert str(app.router['articles.ArticleResource:get'].url_for()) == '/articles/'
         assert str(app.router['articles.ArticleResource:post'].url_for()) == '/articles/'
-        assert str(app.router['articles.ArticleList:post'].url_for(parts={'pk': 42})) == '/articles/42'  # noqa
+        assert str(app.router['articles.ArticleList:post'].url_for(
+            pk='42')) == '/articles/42'  # noqa
 
     def test_add_resource_context_with_url_prefix(self, app):
         with add_resource_context(app, views, url_prefix='/api/') as route:

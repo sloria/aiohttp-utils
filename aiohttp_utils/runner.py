@@ -35,9 +35,11 @@ class GunicornWorker(BaseWorker):
         app._loop = self.loop
         return super().make_handler(app, **kwargs)
 
+
 class GunicornApp(BaseApplication):
 
-    def __init__(self, app: web.Application, app_uri: str=None, *args, **kwargs):
+    def __init__(self, app: web.Application,
+                 app_uri: str = None, *args, **kwargs):
         self._app = app
         self.app_uri = app_uri
         super().__init__(*args, **kwargs)
@@ -53,16 +55,17 @@ class GunicornApp(BaseApplication):
             return import_app(self.app_uri)
         return self._app
 
+
 class Runner:
     worker_class = 'aiohttp_utils.runner.GunicornWorker'
 
     def __init__(
         self,
-        app: web.Application=None,
-        app_uri: str=None,
+        app: web.Application = None,
+        app_uri: str = None,
         host='127.0.0.1',
         port=5000,
-        reload: bool=None,
+        reload: bool = None,
         **options
     ):
         warnings.warn('aiohttp_utils.runner is deprecated. '
@@ -110,7 +113,7 @@ def run(app: web.Application, **kwargs):
     :param bool reload: Whether to reload the server on a code change.
         If not set, will take the same value as ``app.debug``.
         **EXPERIMENTAL**.
-    :param \*\*kwargs: Extra configuration options to set on the
+    :param kwargs: Extra configuration options to set on the
         ``GunicornApp's`` config object.
     """
     runner = Runner(app, **kwargs)

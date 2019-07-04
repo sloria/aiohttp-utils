@@ -25,9 +25,11 @@ from aiohttp_utils import Response, routing, negotiation
 
 app = web.Application(router=routing.ResourceRouter())
 
+
 @coroutine
 def index(request):
     return Response('Welcome!')
+
 
 class HelloResource:
 
