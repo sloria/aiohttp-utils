@@ -58,13 +58,13 @@ class TestResourceRouter:
     def test_default_names(self, app):
         configure_app(app)
 
-        assert app.router['MyResource:get'].url() == '/my'
-        assert app.router['MyResource:post'].url() == '/my'
+        assert str(app.router['MyResource:get'].url_for()) == '/my'
+        assert str(app.router['MyResource:post'].url_for()) == '/my'
 
     def test_name_override(self, app):
         configure_app(app)
-        assert app.router['my_resource2_get'].url() == '/my2'
-        assert app.router['MyResource2:post'].url() == '/my2'
+        assert str(app.router['my_resource2_get'].url_for()) == '/my2'
+        assert str(app.router['MyResource2:post'].url_for()) == '/my2'
 
     def test_methods_param(self, app, client):
         configure_app(app)
@@ -84,9 +84,9 @@ class TestAddRouteContext:
             route('GET', '/projects/', 'list_projects')
             route('POST', '/projects', 'create_projects')
 
-        assert app.router['index'].url() == '/'
-        assert app.router['list_projects'].url() == '/projects/'
-        assert app.router['create_projects'].url() == '/projects'
+        assert str(app.router['index'].url_for()) == '/'
+        assert str(app.router['list_projects'].url_for()) == '/projects/'
+        assert str(app.router['create_projects'].url_for()) == '/projects'
 
     def test_add_route_context_passing_handler_functions(self, app):
         with add_route_context(app) as route:
@@ -94,9 +94,9 @@ class TestAddRouteContext:
             route('GET', '/projects/', views.list_projects)
             route('POST', '/projects', views.create_projects)
 
-        assert app.router['index'].url() == '/'
-        assert app.router['list_projects'].url() == '/projects/'
-        assert app.router['create_projects'].url() == '/projects'
+        assert str(app.router['index'].url_for()) == '/'
+        assert str(app.router['list_projects'].url_for()) == '/projects/'
+        assert str(app.router['create_projects'].url_for()) == '/projects'
 
     def test_passing_module_and_handlers_as_strings(self, app):
         with add_route_context(app, module='tests.views') as route:
@@ -104,15 +104,15 @@ class TestAddRouteContext:
             route('GET', '/projects/', 'list_projects')
             route('POST', '/projects', 'create_projects')
 
-        assert app.router['index'].url() == '/'
-        assert app.router['list_projects'].url() == '/projects/'
-        assert app.router['create_projects'].url() == '/projects'
+        assert str(app.router['index'].url_for()) == '/'
+        assert str(app.router['list_projects'].url_for()) == '/projects/'
+        assert str(app.router['create_projects'].url_for()) == '/projects'
 
     def test_route_name_override(self, app):
         with add_route_context(app) as route:
             route('GET', '/', views.index, name='home')
 
-        assert app.router['home'].url() == '/'
+        assert str(app.router['home'].url_for()) == '/'
 
     def test_add_route_raises_error_if_handler_not_found(self, app):
         with add_route_context(app, views) as route:
@@ -124,16 +124,16 @@ class TestAddRouteContext:
             route('GET', '/', 'index')
             route('GET', '/projects/', 'list_projects')
 
-        assert app.router['index'].url() == '/api/'
-        assert app.router['list_projects'].url() == '/api/projects/'
+        assert str(app.router['index'].url_for()) == '/api/'
+        assert str(app.router['list_projects'].url_for()) == '/api/projects/'
 
     def test_add_route_context_with_name_prefix(self, app):
         with add_route_context(app, views, name_prefix='api') as route:
             route('GET', '/', 'index')
             route('GET', '/projects/', 'list_projects')
 
-        assert app.router['api.index'].url() == '/'
-        assert app.router['api.list_projects'].url() == '/projects/'
+        assert str(app.router['api.index'].url_for()) == '/'
+        assert str(app.router['api.list_projects'].url_for()) == '/projects/'
 
 class TestAddResourceContext:
 
@@ -142,26 +142,26 @@ class TestAddResourceContext:
             route('/articles/', 'ArticleResource')
             route('/articles/{pk}', 'ArticleList')
 
-        assert app.router['ArticleResource:get'].url() == '/articles/'
-        assert app.router['ArticleResource:post'].url() == '/articles/'
-        assert app.router['ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+        assert str(app.router['ArticleResource:get'].url_for()) == '/articles/'
+        assert str(app.router['ArticleResource:post'].url_for()) == '/articles/'
+        assert str(app.router['ArticleList:post'].url_for(parts={'pk': 42})) == '/articles/42'
 
     def test_add_resource_context_passing_classes(self, app):
         with add_resource_context(app) as route:
             route('/articles/', views.ArticleResource())
             route('/articles/{pk}', views.ArticleList())
 
-        assert app.router['ArticleResource:get'].url() == '/articles/'
-        assert app.router['ArticleResource:post'].url() == '/articles/'
+        assert str(app.router['ArticleResource:get'].url_for()) == '/articles/'
+        assert str(app.router['ArticleResource:post'].url_for()) == '/articles/'
 
     def test_passing_module_and_resources_as_strings(self, app):
         with add_resource_context(app, module='tests.views') as route:
             route('/articles/', 'ArticleResource')
             route('/articles/{pk}', 'ArticleList')
 
-        assert app.router['ArticleResource:get'].url() == '/articles/'
-        assert app.router['ArticleResource:post'].url() == '/articles/'
-        assert app.router['ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+        assert str(app.router['ArticleResource:get'].url_for()) == '/articles/'
+        assert str(app.router['ArticleResource:post'].url_for()) == '/articles/'
+        assert str(app.router['ArticleList:post'].url_for(parts={'pk': 42})) == '/articles/42'
 
     def test_make_resource_override(self, app):
         db = {}
@@ -179,27 +179,27 @@ class TestAddResourceContext:
             route('/articles/', views.ArticleResource())
             route('/articles/{pk}', views.ArticleList())
 
-        assert app.router['articles.ArticleResource:get'].url() == '/articles/'
-        assert app.router['articles.ArticleResource:post'].url() == '/articles/'
-        assert app.router['articles.ArticleList:post'].url(parts={'pk': 42}) == '/articles/42'
+        assert str(app.router['articles.ArticleResource:get'].url_for()) == '/articles/'
+        assert str(app.router['articles.ArticleResource:post'].url_for()) == '/articles/'
+        assert str(app.router['articles.ArticleList:post'].url_for(parts={'pk': 42})) == '/articles/42'  # noqa
 
     def test_add_resource_context_with_url_prefix(self, app):
         with add_resource_context(app, views, url_prefix='/api/') as route:
             route('/articles/', 'ArticleResource')
 
-        assert app.router['ArticleResource:get'].url() == '/api/articles/'
-        assert app.router['ArticleResource:post'].url() == '/api/articles/'
+        assert str(app.router['ArticleResource:get'].url_for()) == '/api/articles/'
+        assert str(app.router['ArticleResource:post'].url_for()) == '/api/articles/'
 
     def test_add_resource_context_with_name_prefix(self, app):
         with add_resource_context(app, views, name_prefix='api') as route:
             route('/articles/', 'ArticleResource')
 
-        assert app.router['api.ArticleResource:get'].url() == '/articles/'
-        assert app.router['api.ArticleResource:post'].url() == '/articles/'
+        assert str(app.router['api.ArticleResource:get'].url_for()) == '/articles/'
+        assert str(app.router['api.ArticleResource:post'].url_for()) == '/articles/'
 
     def test_add_resource_context_with_name_prefix_and_override(self, app):
         with add_resource_context(app, views, name_prefix='api') as route:
             route('/articles/', 'ArticleResource', names={'get': 'list_articles'})
 
-        assert app.router['api.list_articles'].url() == '/articles/'
-        assert app.router['api.ArticleResource:post'].url() == '/articles/'
+        assert str(app.router['api.list_articles'].url_for()) == '/articles/'
+        assert str(app.router['api.ArticleResource:post'].url_for()) == '/articles/'
