@@ -21,7 +21,8 @@ from aiohttp_utils import Response, negotiation
 
 from mako.lookup import TemplateLookup
 
-##### Templates #####
+
+# ##### Templates #####
 
 lookup = TemplateLookup()
 # Note: In a real app, this would be in a separate file.
@@ -34,25 +35,28 @@ template = """
 """
 lookup.put_string('index.html', template)
 
-##### Handlers #####
+
+# ##### Handlers #####
 
 @coroutine
 def index(request):
     return Response({
-        'message': 'Hello ' + request.GET.get('name', 'World')
+        'message': 'Hello ' + request.query.get('name', 'World')
     })
 
-##### Custom router #####
+
+# ##### Custom router #####
 
 class RouterWithTemplating(web.UrlDispatcher):
     """Optionally save a template name on a handler function's __dict__."""
 
-    def add_route(self, method, path, handler, template: str=None, **kwargs):
+    def add_route(self, method, path, handler, template: str = None, **kwargs):
         if template:
             handler.__dict__['template'] = template
         super().add_route(method, path, handler, **kwargs)
 
-##### Renderer #####
+
+# ##### Renderer #####
 
 def render_mako(request, data):
     handler = request.match_info.handler
@@ -66,7 +70,8 @@ def render_mako(request, data):
     text = template.render_unicode(**data)
     return web.Response(text=text, content_type=request['selected_media_type'])
 
-##### Configuration #####
+
+# ##### Configuration #####
 
 CONFIG = {
     'AIOHTTP_UTILS': {
@@ -77,7 +82,8 @@ CONFIG = {
     }
 }
 
-##### Application #####
+
+# ##### Application #####
 
 app = web.Application(router=RouterWithTemplating(), debug=True)
 app['mako_lookup'] = lookup

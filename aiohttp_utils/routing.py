@@ -11,6 +11,7 @@ __all__ = (
     'add_resource_context',
 )
 
+
 class ResourceRouter(web.UrlDispatcher):
     """Router with an :meth:`add_resource` method for registering method-based handlers,
     a.k.a "resources". Includes all the methods `aiohttp.web.UrlDispatcher` with the addition
@@ -57,7 +58,8 @@ class ResourceRouter(web.UrlDispatcher):
     def get_default_handler_name(self, resource, method_name: str):
         return '{resource.__class__.__name__}:{method_name}'.format(**locals())
 
-    def add_resource_object(self, path: str, resource, methods: tuple=tuple(), names: Mapping=None):
+    def add_resource_object(self, path: str, resource,
+                            methods: tuple = tuple(), names: Mapping = None):
         """Add routes by an resource instance's methods.
 
         :param path: route path. Should be started with slash (``'/'``).
@@ -76,15 +78,17 @@ class ResourceRouter(web.UrlDispatcher):
                 name = names.get(method_name, self.get_default_handler_name(resource, method_name))
                 self.add_route(method_name.upper(), path, handler, name=name)
 
+
 def make_path(path, url_prefix=None):
     return ('/'.join((url_prefix.rstrip('/'), path.lstrip('/')))
             if url_prefix
             else path)
 
+
 @contextmanager
 def add_route_context(
-    app: web.Application, module=None, url_prefix: str=None, name_prefix: str=None
-):
+    app: web.Application, module=None,
+        url_prefix: str = None, name_prefix: str = None):
     """Context manager which yields a function for adding multiple routes from a given module.
 
     Example:
@@ -156,11 +160,12 @@ def get_supported_method_names(resource):
         if hasattr(resource, method_name)
     ]
 
+
 @contextmanager
 def add_resource_context(
-    app: web.Application, module=None,
-    url_prefix: str=None, name_prefix: str=None, make_resource=lambda cls: cls()
-):
+        app: web.Application, module=None,
+        url_prefix: str = None, name_prefix: str = None,
+        make_resource=lambda cls: cls()):
     """Context manager which yields a function for adding multiple resources from a given module
     to an app using `ResourceRouter <aiohttp_utils.routing.ResourceRouter>`.
 
@@ -187,7 +192,7 @@ def add_resource_context(
             route('/articles/{pk}', views.ArticleDetail())
 
         app.router['ArticleList:get'].url()  # /api/articles/
-        app.router['ArticleDetail:get'].url(parts={'pk': 42})  # /api/articles/42
+        app.router['ArticleDetail:get'].url(pk='42')  # /api/articles/42
 
     If you prefer, you can also pass module and class names as strings. ::
 
@@ -239,9 +244,8 @@ def add_resource_context(
 
     default_make_resource = make_resource
 
-    def add_route(
-        path: str, resource, names: Mapping=None, make_resource=None
-    ):
+    def add_route(path: str, resource,
+                  names: Mapping = None, make_resource=None):
         make_resource = make_resource or default_make_resource
         names = names or {}
         if isinstance(resource, (str, bytes)):
