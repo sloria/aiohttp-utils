@@ -2,6 +2,14 @@
 Changelog
 *********
 
+3.1.0 (2019-07-09)
+==================
+
+- Add support for aiohttp>=3.
+- Drop support for Python 3.4.
+- Test against Python 3.7.
+- [negotiation]: Add a new `force_rendering` config option.
+
 3.0.0 (2016-03-16)
 ==================
 
