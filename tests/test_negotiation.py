@@ -36,11 +36,15 @@ def add_routes(app):
     def post_coro_handler(request):
         return Response({'message': 'Post coro'}, status=201)
 
+    def handler_no_nego(request):
+        return web.Response(body=b'Some raw data')
+
     app.router.add_route('GET', '/hello', handler)
     app.router.add_route('GET', '/hellocoro', coro_handler)
     app.router.add_route('POST', '/postcoro', post_coro_handler)
     app.router.add_route('GET', '/false', handler_false)
     app.router.add_route('GET', '/none', handler_none)
+    app.router.add_route('GET', '/nonego', handler_no_nego)
 
 
 def configure_app(app, overrides=None, setup=False):
@@ -167,3 +171,16 @@ def test_configuration_through_app_key(app, client):
     res = client.get('/hello')
     assert res.content_type == 'text/html'
     assert res.body == b'<p>Hello world</p>'
+
+
+def test_renderer_no_nego(app, client):
+    add_routes(app)
+    negotiation.setup(app)
+
+    res = client.get('/nonego')
+    assert res.content_type == 'application/octet-stream'
+    assert res.body == b'Some raw data'
+
+    res = client.get('/nonego', headers={'Accept': 'application/json'})
+    assert res.content_type == 'application/octet-stream'
+    assert res.body == b'Some raw data'

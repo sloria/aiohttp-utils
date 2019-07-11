@@ -215,18 +215,19 @@ def negotiation_middleware(
             request['selected_media_type'] = content_type
             response = yield from handler(request)
 
-            if force_rendering or getattr(response, 'data', None):
+            data = getattr(response, 'data', None)
+            if isinstance(response, Response) and (force_rendering or data):
                 # Render data with the selected renderer
                 if asyncio.iscoroutinefunction(renderer):
-                    render_result = yield from renderer(request, response.data)
+                    render_result = yield from renderer(request, data)
                 else:
-                    render_result = renderer(request, response.data)
+                    render_result = renderer(request, data)
             else:
                 render_result = response
             if isinstance(render_result, web.Response):
                 return render_result
 
-            if force_rendering or getattr(response, 'data', None) is not None:
+            if force_rendering or data is not None:
                 response.body = render_result
                 response.content_type = content_type
 
