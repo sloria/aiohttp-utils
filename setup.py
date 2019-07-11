@@ -8,6 +8,7 @@ REQUIRES = [
     'gunicorn',
 ]
 
+
 def find_version(fname):
     """Attempts to find the version number in the file names fname.
     Raises RuntimeError if not found.
@@ -37,6 +38,7 @@ setup(
     version=__version__,
     description='Handy utilities for aiohttp.web applications.',
     long_description=read('README.rst'),
+    long_description_content_type='text/x-rst',
     author='Steven Loria',
     author_email='sloria1@gmail.com',
     url='https://github.com/sloria/aiohttp_utils',
