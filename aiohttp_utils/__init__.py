@@ -3,7 +3,7 @@ from .negotiation import Response
 from .constants import APP_KEY, CONFIG_KEY
 from .runner import run
 
-__version__ = '3.1.0'
+__version__ = '3.1.1'
 __author__ = 'Steven Loria'
 __license__ = "MIT"
 

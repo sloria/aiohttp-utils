@@ -2,6 +2,12 @@
 Changelog
 *********
 
+3.1.1 (2019-07-11)
+==================
+
+- [negotiation]: Fix handling of aiohttp.web.Response when force_rendering is set.
+- Add examples to the MANIFEST.
+
 3.1.0 (2019-07-09)
 ==================
 
