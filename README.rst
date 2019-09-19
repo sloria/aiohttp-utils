@@ -1,16 +1,16 @@
 *************
-aiohttp_utils
+aiohttp-utils
 *************
 
-.. image:: https://badge.fury.io/py/aiohttp_utils.png
-    :target: http://badge.fury.io/py/aiohttp_utils
+.. image:: https://badgen.net/pypi/v/aiohttp-utils
+    :target: https://pypi.org/project/aiohttp-utils/
     :alt: Latest version
 
-.. image:: https://travis-ci.org/sloria/aiohttp_utils.png
-    :target: https://travis-ci.org/sloria/aiohttp_utils
+.. image:: https://badgen.net/travis/sloria/aiohttp-utils
+    :target: https://travis-ci.org/sloria/aiohttp-utils
     :alt: Travis-CI
 
-**aiohttp_utils** provides handy utilities for building `aiohttp.web <https://aiohttp.readthedocs.io/>`_ applications.
+**aiohttp-utils** provides handy utilities for building `aiohttp.web <https://aiohttp.readthedocs.io/>`_ applications.
 
 
 * Method-based handlers ("resources")
@@ -49,7 +49,7 @@ Install
 =======
 ::
 
-    $ pip install aiohttp_utils
+    $ pip install aiohttp-utils
 
 Documentation
 =============
@@ -61,10 +61,10 @@ Project Links
 
 - Docs: https://aiohttp-utils.readthedocs.io/
 - Changelog: https://aiohttp-utils.readthedocs.io/en/latest/changelog.html
-- PyPI: https://pypi.python.org/pypi/aiohttp_utils
-- Issues: https://github.com/sloria/aiohttp_utils/issues
+- PyPI: https://pypi.python.org/pypi/aiohttp-utils
+- Issues: https://github.com/sloria/aiohttp-utils/issues
 
 License
 =======
 
-MIT licensed. See the bundled `LICENSE <https://github.com/sloria/aiohttp_utils/blob/master/LICENSE>`_ file for more details.
+MIT licensed. See the bundled `LICENSE <https://github.com/sloria/aiohttp-utils/blob/master/LICENSE>`_ file for more details.

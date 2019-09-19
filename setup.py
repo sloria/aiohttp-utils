@@ -34,16 +34,16 @@ def read(fname):
     return content
 
 setup(
-    name='aiohttp_utils',
+    name='aiohttp-utils',
     version=__version__,
     description='Handy utilities for aiohttp.web applications.',
     long_description=read('README.rst'),
     long_description_content_type='text/x-rst',
     author='Steven Loria',
     author_email='sloria1@gmail.com',
-    url='https://github.com/sloria/aiohttp_utils',
+    url='https://github.com/sloria/aiohttp-utils',
     packages=find_packages(exclude=("test*", )),
-    package_dir={'aiohttp_utils': 'aiohttp_utils'},
+    package_dir={'aiohttp-utils': 'aiohttp_utils'},
     include_package_data=True,
     install_requires=REQUIRES,
     license='MIT',
