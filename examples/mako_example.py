@@ -13,7 +13,8 @@ Try it out:
     $ http :8000/ Accept:application/json
     $ http :8000/ Accept:text/html
 """
-from collections import OrderedDict, Mapping
+from collections import OrderedDict
+from collections.abc import Mapping
 from asyncio import coroutine
 
 from aiohttp import web
