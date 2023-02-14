@@ -202,24 +202,21 @@ def negotiation_middleware(
     """Middleware which selects a renderer for a given request then renders
     a handler's data to a `aiohttp.web.Response`.
     """
-    @asyncio.coroutine
-    def factory(app, handler):
-
-        @asyncio.coroutine
-        def middleware(request):
+    async def factory(app, handler):
+        async def middleware(request):
             content_type, renderer = negotiator(
                 request,
                 renderers,
                 force_negotiation,
             )
             request['selected_media_type'] = content_type
-            response = yield from handler(request)
+            response = await handler(request)
 
             data = getattr(response, 'data', None)
             if isinstance(response, Response) and (force_rendering or data):
                 # Render data with the selected renderer
                 if asyncio.iscoroutinefunction(renderer):
-                    render_result = yield from renderer(request, data)
+                    render_result = await renderer(request, data)
                 else:
                     render_result = renderer(request, data)
             else:

@@ -27,7 +27,6 @@ def create_client():
 
 
 def make_dummy_handler(**kwargs):
-    @asyncio.coroutine
-    def dummy(request):
+    async def dummy(request):
         return web.Response(**kwargs)
     return dummy

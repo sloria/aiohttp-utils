@@ -12,6 +12,6 @@ wheel
 twine
 
 # Syntax checking
-flake8==2.4.1
+flake8==5.0.4
 
 -e .
