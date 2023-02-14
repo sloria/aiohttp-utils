@@ -2,6 +2,19 @@
 Changelog
 *********
 
+3.2.1 (2023-02-14)
+==================
+
+- Actually bump package version...
+
+3.2.0 (2023-02-14)
+==================
+
+- Add support for Python 3.10 and 3.11
+- Switch ci to gh actions
+- Rename package name as aiohttp-utils
+
+
 3.1.1 (2019-07-11)
 ==================
 
