@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from collections import OrderedDict
 
 from aiohttp import web
@@ -28,12 +27,10 @@ def add_routes(app):
     def handler_none(request):
         return Response(None)
 
-    @asyncio.coroutine
-    def coro_handler(request):
+    async def coro_handler(request):
         return Response({'message': 'Hello coro'})
 
-    @asyncio.coroutine
-    def post_coro_handler(request):
+    async def post_coro_handler(request):
         return Response({'message': 'Post coro'}, status=201)
 
     def handler_no_nego(request):

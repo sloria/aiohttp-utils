@@ -15,7 +15,6 @@ Try it out:
 """
 from collections import OrderedDict
 from collections.abc import Mapping
-from asyncio import coroutine
 
 from aiohttp import web
 from aiohttp_utils import Response, negotiation
@@ -39,8 +38,7 @@ lookup.put_string('index.html', template)
 
 # ##### Handlers #####
 
-@coroutine
-def index(request):
+async def index(request):
     return Response({
         'message': 'Hello ' + request.query.get('name', 'World')
     })

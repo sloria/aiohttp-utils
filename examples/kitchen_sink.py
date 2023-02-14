@@ -18,23 +18,19 @@ Try it out:
     $ http :8000/
     $ http :8000/api/
 """
-from asyncio import coroutine
-
 from aiohttp import web
 from aiohttp_utils import Response, routing, negotiation
 
 app = web.Application(router=routing.ResourceRouter())
 
 
-@coroutine
-def index(request):
+async def index(request):
     return Response('Welcome!')
 
 
 class HelloResource:
 
-    @coroutine
-    def get(self, request):
+    async def get(self, request):
         return Response({
             'message': 'Welcome to the API!'
         })
